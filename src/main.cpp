@@ -1,13 +1,18 @@
 #include <Arduino.h>
+#include <WebServer.h>
+#include <WiFi.h>
 
-// put function declarations here:
-int myFunction(int, int);
+const char* wifiid = "ESP32 FROM THE PROJECT 2405";
+const char* wifipass = "ADOROAPROJETE";
+
+WebServer server(80);
 
 void setup() {
-  // put your setup code here, to run once:
+  WiFi.softAP(wifiid, wifipass);
+  server.begin();
 }
 
 void loop() {
-  // put your main code here, to run repeatedly:
+  delay(10000);
 }
 
