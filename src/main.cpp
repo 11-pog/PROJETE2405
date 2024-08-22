@@ -1,18 +1,37 @@
 #include <Arduino.h>
-#include <WebServer.h>
 #include <WiFi.h>
 
-const char* wifiid = "ESP32 FROM THE PROJECT 2405";
-const char* wifipass = "ADOROAPROJETE";
+const char *wifiid = "WarningWarningWarning";
+const char *wifipass = "porraporra";
 
-WebServer server(80);
+WiFiServer server(80);
 
-void setup() {
-  WiFi.softAP(wifiid, wifipass);
+void setup()
+{
+  Serial.begin(9600);
+
+  WiFi.begin(wifiid, wifipass);
+
+  Serial.print("Connecting to ");
+  Serial.println(wifiid);
+  WiFi.begin(wifiid, wifipass);
+  while (WiFi.status() != WL_CONNECTED)
+  {
+    delay(500);
+    Serial.print(".");
+  }
+  Serial.println("");
+  Serial.println("WiFi connected.");
+  Serial.println("IP address: ");
+  Serial.println(WiFi.localIP());
   server.begin();
 }
 
-void loop() {
-  delay(10000);
-}
+void loop()
+{
+  WiFiClient client = server.available();
 
+  if (client)
+  {
+  }
+}
