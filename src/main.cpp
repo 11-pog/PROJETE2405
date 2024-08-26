@@ -49,8 +49,8 @@ namespace Funcs
 
     return humidityValue;
   }
-};
-/*
+
+  /*
 void ExplodeOnProjete(datetime Day)
 {
   if (Day == DiaOfProjete)
@@ -59,7 +59,8 @@ void ExplodeOnProjete(datetime Day)
   }
 }
 */
-// joke funcgion ignore pls
+  // joke funcgion ignore pls
+};
 
 void setup()
 {
