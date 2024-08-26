@@ -23,7 +23,6 @@ WiFiServer server(80);
 
 namespace Funcs
 {
-public:
   static float GetUltraSonic()
   {
     long duration;
@@ -44,7 +43,6 @@ public:
     return distanceCm;
   }
 
-public:
   static float GetHumidity()
   {
     float humidityValue = dht.readHumidity();
