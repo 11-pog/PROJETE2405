@@ -21,7 +21,7 @@ const char *wifipass = "porraporra";
 
 WiFiServer server(80);
 
-class Funcs
+namespace Funcs
 {
 public:
   static float GetUltraSonic()
