@@ -50,15 +50,22 @@ namespace Funcs
     return humidityValue;
   }
 
-  /*
-void ExplodeOnProjete(datetime Day)
-{
-  if (Day == DiaOfProjete)
+  static float GetTemperature()
   {
-    Self.Explode();
+    float Temp = dht.readTemperature();
+
+    return Temp;
   }
-}
-*/
+
+  /*
+  void ExplodeOnProjete(DateTime Day)
+  {
+    if (Day == DiaOfProjete)
+    {
+      Self.Explode();
+    }
+  }
+  */
   // joke funcgion ignore pls
 };
 
@@ -89,6 +96,12 @@ void setup()
   pinMode(echoPin, INPUT);
 
   // server.begin();
+
+  for (byte i = 20; i > 0; i--)
+  {
+    Serial.println(i);
+    delay(500);
+  }
 }
 
 void loop()
@@ -102,10 +115,12 @@ void loop()
     }
   */
 
-  Serial.print("Humidity and ultrasonic: ");
+  Serial.print("Humidity, Temperature and ultrasonic: ");
   Serial.print(Funcs::GetHumidity());
+  Serial.print(", ");
+  Serial.print(Funcs::GetTemperature());
   Serial.print(", ");
   Serial.println(Funcs::GetUltraSonic());
 
-  delay(2000);
+  delay(200);
 }
