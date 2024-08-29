@@ -1,6 +1,8 @@
 {
     "files.associations": {
         ".fantomasignore": "ignore",
-        "time.h": "c"
-    }
+        "time.h": "c",
+        "cstddef": "cpp"
+    },
+    "C_Cpp.default.compilerPath": "C:/Users/alves/.platformio/packages/toolchain-xtensa-esp32/bin/xtensa-esp32-elf-gcc.exe",
 }
