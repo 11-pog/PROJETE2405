@@ -1,5 +1,4 @@
 #include <Arduino.h>
-#include <WiFi.h>
 #include <DHT.h>
 #include <DHT_U.h>
 
@@ -15,11 +14,6 @@ const int trigPin = 5;
 const int echoPin = 18;
 
 /**/
-
-const char *wifiid = "WarningWarningWarning";
-const char *wifipass = "porraporra";
-
-WiFiServer server(80);
 
 namespace Funcs
 {
@@ -72,30 +66,11 @@ namespace Funcs
 void setup()
 {
   Serial.begin(9600);
-  /*
-    WiFi.begin(wifiid, wifipass);
-
-    Serial.print("Connecting to ");
-    Serial.println(wifiid);
-    WiFi.begin(wifiid, wifipass);
-
-    while (WiFi.status() != WL_CONNECTED)
-    {
-      delay(1000);
-      Serial.print(".");
-    }
-
-    Serial.println("");
-    Serial.println("WiFi connected.");
-    Serial.println("IP address: ");
-    Serial.println(WiFi.localIP());
-  */
+  
   dht.begin();
 
   pinMode(trigPin, OUTPUT);
   pinMode(echoPin, INPUT);
-
-  // server.begin();
 
   for (byte i = 20; i > 0; i--)
   {
@@ -106,15 +81,6 @@ void setup()
 
 void loop()
 {
-  /*
-    WiFiClient client = server.available();
-
-    if (client)
-    {
-      // wip possibly abandoned idea
-    }
-  */
-
   Serial.print("Humidity, Temperature and ultrasonic: ");
   Serial.print(Funcs::GetHumidity());
   Serial.print(", ");
