@@ -1,9 +1,12 @@
 #include <Arduino.h>
 #include <DHT.h>
 #include <DHT_U.h>
+#include <Preferences.h>
 
 #define DHT_PIN 12
 #define DHT_TYPE DHT22
+
+#define FLASH_SIZE 20
 
 // define sound speed in cm/uS
 #define SOUND_SPEED 0.034
@@ -67,6 +70,8 @@ void setup()
 {
   Serial.begin(9600);
   
+  EEPROM.begin(FLASH_SIZE);
+
   dht.begin();
 
   pinMode(trigPin, OUTPUT);
