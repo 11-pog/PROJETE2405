@@ -1,6 +1,6 @@
 #ifndef CppInterop_H
 #define CppInterop_H
 
-typedef uint8 byte;
+typedef u_int8_t byte;
 
 #endif
