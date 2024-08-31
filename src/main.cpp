@@ -96,8 +96,12 @@ void setup()
 
 void loop()
 {
-  Serial.print("pedro: pedro");
-
+  Serial.print("Humidity, Temperature and ultrasonic: ");
+  Serial.print(Funcs::GetHumidity());
+  Serial.print(", ");
+  Serial.print(Funcs::GetTemperature());
+  Serial.print(", ");
+  Serial.println(Funcs::GetUltraSonic());
 
   delay(200);
 }
