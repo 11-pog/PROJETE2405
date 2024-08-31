@@ -1,8 +1,13 @@
+// Bibliotecas do ESP32
 #include <Arduino.h>
 #include <DHT.h>
 #include <DHT_U.h>
 #include <Preferences.h>
 
+// Bibliotecas privadas do projeto
+#include <CppInterop.h>
+
+// Definições de constantes
 #define DHT_PIN 12
 #define DHT_TYPE DHT22
 
@@ -17,6 +22,11 @@ const int trigPin = 5;
 const int echoPin = 18;
 
 /**/
+
+namespace Flash
+{
+  Preferences Schedule;
+}
 
 namespace Funcs
 {
@@ -70,7 +80,7 @@ void setup()
 {
   Serial.begin(9600);
   
-  EEPROM.begin(FLASH_SIZE);
+  Flash::Schedule.begin("Schedule", false);
 
   dht.begin();
 
@@ -86,12 +96,8 @@ void setup()
 
 void loop()
 {
-  Serial.print("Humidity, Temperature and ultrasonic: ");
-  Serial.print(Funcs::GetHumidity());
-  Serial.print(", ");
-  Serial.print(Funcs::GetTemperature());
-  Serial.print(", ");
-  Serial.println(Funcs::GetUltraSonic());
+  Serial.print("pedro: pedro");
+
 
   delay(200);
 }
