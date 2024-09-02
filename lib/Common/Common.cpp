@@ -1,10 +1,3 @@
-// Bibliotecas do ESP32
-#include <Arduino.h>
-#include <CppTypeDefs.h>
-#include <time.h>
-#include <DHT_U.h>
-#include <DHT.h>
-
 // Referencia ao header desse arquivo
 #include <Common.h>
 
@@ -12,109 +5,94 @@
 
 namespace Common
 {
-  class Time
+  Clock::Clock(long timezone, byte daysavetime){
+    this->timezone = timezone;
+    this->daysavetime = daysavetime;
+  }
+
+  void Clock::SyncTime()
   {
-    LocalTime localTime;
+    configTime(timezone * 3600, daysavetime * 3600, "time.nist.gov", "0.pool.ntp.org", "1.pool.ntp.org");
+  }
 
-    long timezone;
-    byte daysavetime;
-
-    Time(byte timezone = -4, byte daysavetime = 1)
-    {
-      this->daysavetime = daysavetime;
-      this->timezone = timezone;
-    }
-
-    void SyncTime()
-    {
-      configTime(3600 * timezone, daysavetime * 3600, "time.nist.gov", "0.pool.ntp.org", "1.pool.ntp.org");
-    }
-
-    void UpdateTime()
-    {
-      getLocalTime(&localTime);
-    }
-
-    void PrintDateTime()
-    {
-      UpdateTime();
-      String date = String((localTime.tm_mon) + 1) + "/" + String(localTime.tm_mday);
-      String time = (String(localTime.tm_hour) + ":" + String(localTime.tm_min) + ":" + String(localTime.tm_sec));
-
-      Serial.print(date);
-      Serial.print("  ");
-      Serial.println(time);
-    }
-
-    DateTime GetCurrentTime()
-    {
-      UpdateTime();
-      return localTime;
-    }
-
-    void WhileWaitPerform(std::function<void()> Action, long delay)
-    {
-    }
-  };
-
-  namespace Sensor
+  void Clock::UpdateTime()
   {
-    class DHT_Sensor
-    {
-      DHT dht;
+    getLocalTime(&localTime);
+  }
 
-      DHT_Sensor(int pin, byte type) : dht(pin, type)
-      {
-        dht.begin();
-      }
+  void Clock::PrintDateTime()
+  {
+    UpdateTime();
+    String date = String((localTime.tm_mon) + 1) + "/" + String(localTime.tm_mday);
+    String time = (String(localTime.tm_hour) + ":" + String(localTime.tm_min) + ":" + String(localTime.tm_sec));
 
-      float GetHumidity()
-      {
-        float humidityValue = dht.readHumidity();
+    Serial.print(date);
+    Serial.print("  ");
+    Serial.println(time);
+  }
 
-        return humidityValue;
-      }
+  DateTime Clock::GetCurrentTime()
+  {
+    UpdateTime();
+    return localTime;
+  }
 
-      float GetTemperature()
-      {
-        float Temp = dht.readTemperature();
+  void Clock::WhileWaitPerform(std::function<void()> Action, long delay)
+  {
+  }
+}
 
-        return Temp;
-      }
-    };
 
-    class Ultrasonic_Sensor
-    {
-      byte trigPin;
-      byte echoPin;
 
-      Ultrasonic_Sensor(byte trig, byte echo)
-      {
-        this->trigPin = trig;
-        this->echoPin = echo;
-      }
+namespace Common::Sensor
+{
+  DHT_Sensor::DHT_Sensor(int pin, byte type) : dht(pin, type)
+  {
+    dht.begin();
+  }
 
-      float GetUltraSonic()
-      {
-        long duration;
-        float distanceCm;
+  float DHT_Sensor::GetHumidity()
+  {
+    float humidityValue = dht.readHumidity();
 
-        digitalWrite(trigPin, LOW);
-        delayMicroseconds(2);
+    return humidityValue;
+  }
 
-        digitalWrite(trigPin, HIGH);
-        delayMicroseconds(10);
+  float DHT_Sensor::GetTemperature()
+  {
+    float Temp = dht.readTemperature();
 
-        digitalWrite(trigPin, LOW);
+    return Temp;
+  }
 
-        duration = pulseIn(echoPin, HIGH);
+  Ultrasonic_Sensor::Ultrasonic_Sensor(byte trig, byte echo)
+  {
+    this->trigPin = trig;
+    this->echoPin = echo;
 
-        distanceCm = duration * SOUND_SPEED / 2;
+    pinMode(trigPin, OUTPUT);
+    pinMode(echoPin, INPUT);
+  }
 
-        return distanceCm;
-      }
-    };
-  };
+  float Ultrasonic_Sensor::GetUltraSonic()
+  {
+    long duration;
+    float distanceCm;
+
+    digitalWrite(trigPin, LOW);
+    delayMicroseconds(2);
+
+    digitalWrite(trigPin, HIGH);
+    delayMicroseconds(10);
+
+    digitalWrite(trigPin, LOW);
+
+    duration = pulseIn(echoPin, HIGH);
+
+    distanceCm = duration * SOUND_SPEED / 2;
+
+    return distanceCm;
+  }
 
   /*
   struct Projete
