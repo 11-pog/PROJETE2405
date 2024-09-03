@@ -29,8 +29,18 @@ void setup()
   ESPClock.SyncTime();
 }
 
+void PrintALotOfDots()
+{
+  Serial.print('.');
+  delay(100);
+}
+
+Common::Time::DelayHandler PrintStuff(PrintALotOfDots);
+
 void loop()
 {
-  ESPClock.PrintDateTime();
+  PrintStuff.DelayInParallel(5000);
+  delay(1000);
+  Serial.println("TEST");
   delay(1000);
 }

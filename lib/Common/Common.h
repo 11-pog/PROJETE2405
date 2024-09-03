@@ -3,10 +3,8 @@
 
 #include <Arduino.h>
 #include <CppTypeDefs.h>
-#include <time.h>
 #include <DHT_U.h>
 #include <DHT.h>
-#include <WiFi.h>
 
 namespace Common
 {
@@ -27,12 +25,15 @@ namespace Common
             byte daysavetime;
         };
 
-        class DelayTask
+        class DelayHandler
         {
         public:
-            void RunInParallel(std::function<void()> Action, unsigned long timeInMillis);
+            DelayHandler(std::function<void()> Task);
+            void DelayInParallel(unsigned long timeInMillis);
+            void SwitchTask(std::function<void()> Task);
 
         private:
+            std::function<void()> Task;
             bool HasDelayElapsed(unsigned long timeInMillis);
             void UpdateLastTime();
             unsigned long lastTime;
@@ -57,7 +58,7 @@ namespace Common
         {
         public:
             Ultrasonic_Sensor(byte trig, byte echo);
-            float GetUltraSonic();
+            float GetDistance();
 
         private:
             byte trigPin;

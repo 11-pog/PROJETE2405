@@ -5,11 +5,9 @@
 
 namespace Common::Time
 {
-  Clock::Clock(long timezone, byte daysavetime)
-  {
-    this->timezone = timezone;
-    this->daysavetime = daysavetime;
-  }
+  //Class Clock
+  //All here are public
+  Clock::Clock(long timezone, byte daysavetime) : timezone(timezone), daysavetime(daysavetime) {}
 
   void Clock::SyncTime()
   {
@@ -38,27 +36,32 @@ namespace Common::Time
     return localTime;
   }
 
-  void DelayTask::RunInParallel(std::function<void()> Action, unsigned long delay)
+  //Class DelayHandler
+  //Publics
+  DelayHandler::DelayHandler(std::function<void()> Task) : Task(Task) {}
+
+  void DelayHandler::DelayInParallel(unsigned long delay)
   {
     UpdateLastTime();
 
     while (!HasDelayElapsed(delay))
     {
-      Action();
+      Task();
     }
   }
 
-  bool DelayTask::HasDelayElapsed(unsigned long delay)
+  void DelayHandler::SwitchTask(std::function<void()> Task)
   {
-    if (millis() - lastTime > delay)
-    {
-      return true;
-    }
-
-    return false;
+    this->Task = Task;
   }
 
-  void DelayTask::UpdateLastTime()
+  //Privates
+  bool DelayHandler::HasDelayElapsed(unsigned long delay)
+  {
+    return millis() - lastTime > delay;
+  }
+
+  void DelayHandler::UpdateLastTime()
   {
     lastTime = millis();
   }
@@ -94,7 +97,7 @@ namespace Common::Sensor
     pinMode(echoPin, INPUT);
   }
 
-  float Ultrasonic_Sensor::GetUltraSonic()
+  float Ultrasonic_Sensor::GetDistance()
   {
     long duration;
     float distanceCm;

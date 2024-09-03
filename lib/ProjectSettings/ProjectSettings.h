@@ -3,6 +3,8 @@
 
 // Bibliotecas do ESP32
 #include <Preferences.h>
+#include <WiFi.h>
+#include <time.h>
 
 // Bibliotecas privadas do projeto
 #include <Common.h>
@@ -27,7 +29,7 @@ namespace Flash // Namespace pra guardar o objeto preferences (Pra ficar bonitin
 
 // Object instantiation
 
-Common::Clock ESPClock(timezone, daysavetime);
+Common::Time::Clock ESPClock(timezone, daysavetime);
 Common::Sensor::DHT_Sensor DHTSensor(DHT_PIN, DHT_TYPE);
 Common::Sensor::Ultrasonic_Sensor USSensor(trigPin, echoPin);
 
