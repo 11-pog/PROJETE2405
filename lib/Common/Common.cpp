@@ -3,9 +3,10 @@
 
 #define SOUND_SPEED 0.034
 
-namespace Common
+namespace Common::Time
 {
-  Clock::Clock(long timezone, byte daysavetime){
+  Clock::Clock(long timezone, byte daysavetime)
+  {
     this->timezone = timezone;
     this->daysavetime = daysavetime;
   }
@@ -37,12 +38,31 @@ namespace Common
     return localTime;
   }
 
-  void Clock::WhileWaitPerform(std::function<void()> Action, long delay)
+  void DelayTask::RunInParallel(std::function<void()> Action, unsigned long delay)
   {
+    UpdateLastTime();
+
+    while (!HasDelayElapsed(delay))
+    {
+      Action();
+    }
+  }
+
+  bool DelayTask::HasDelayElapsed(unsigned long delay)
+  {
+    if (millis() - lastTime > delay)
+    {
+      return true;
+    }
+
+    return false;
+  }
+
+  void DelayTask::UpdateLastTime()
+  {
+    lastTime = millis();
   }
 }
-
-
 
 namespace Common::Sensor
 {

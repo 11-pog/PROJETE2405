@@ -10,21 +10,34 @@
 
 namespace Common
 {
-    class Clock
+    namespace Time
     {
-    public:
-        Clock(long timezone, byte daysavetime);
-        void SyncTime();
-        void UpdateTime();
-        void PrintDateTime();
-        DateTime GetCurrentTime();
-        void WhileWaitPerform(std::function<void()> Action, long delay);
+        class Clock
+        {
+        public:
+            Clock(long timezone, byte daysavetime);
+            void SyncTime();
+            void UpdateTime();
+            void PrintDateTime();
+            DateTime GetCurrentTime();
 
-    private:
-        LocalTime localTime;
-        long timezone;
-        byte daysavetime;
-    };
+        private:
+            LocalTime localTime;
+            long timezone;
+            byte daysavetime;
+        };
+
+        class DelayTask
+        {
+        public:
+            void RunInParallel(std::function<void()> Action, unsigned long timeInMillis);
+
+        private:
+            bool HasDelayElapsed(unsigned long timeInMillis);
+            void UpdateLastTime();
+            unsigned long lastTime;
+        };
+    }
 
     namespace Sensor
     {
