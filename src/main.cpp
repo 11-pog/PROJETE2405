@@ -32,7 +32,7 @@ void setup()
   ESPClock.SyncTime();
 }
 
-TimerActions SerialChecker(SerialUtils::CheckSerialData);
+TimerActions SerialChecker(CheckSerialData);
 
 void loop()
 {

@@ -10,9 +10,6 @@
 // Bibliotecas do C++
 #include <vector>
 
-#define DFT_SERIAL_TIMEOUT 1250U
-#define MOTOR_PIN 19u
-
 namespace Time
 {
     class Clock
@@ -57,10 +54,4 @@ namespace Sensor
     };
 }
 
-namespace SerialUtils
-{
-    void ActUponData(std::vector<String> Data);
-    void CheckSerialData();
-    std::vector<String> ReadSerialData(unsigned int timeOut = DFT_SERIAL_TIMEOUT);
-}
 #endif

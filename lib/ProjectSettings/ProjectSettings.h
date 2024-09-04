@@ -10,6 +10,7 @@
 #include <Common.h>
 #include <TimedEvents.h>
 #include <TimerActions.h>
+#include <SerialUtils.h>
 
 // Definições de constantes
 #define DHT_PIN 12
