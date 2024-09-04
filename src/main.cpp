@@ -6,6 +6,7 @@
 void setup()
 {
   Serial.begin(9600);
+  Serial.setTimeout(500);
 
   Flash::Schedule.begin("Schedule", false);
 
@@ -29,18 +30,53 @@ void setup()
   ESPClock.SyncTime();
 }
 
-void PrintALotOfDots()
+void ActUponData(std::vector<String> Data)
 {
-  Serial.print('.');
-  delay(100);
+  if (Data[0] == "ADD" && Data[1] == "SCHEDULE")
+  {
+    Serial.print("Adding to schedule: ");
+    Serial.println(Data[2]);
+  }
 }
 
-Common::Time::DelayHandler PrintStuff(PrintALotOfDots);
+//Testes
+void CheckSerialData()
+{
+  std::vector<String> DataList;
+
+  while (Serial.available() > 0)
+  {
+    String c = Serial.readStringUntil(' ');
+    c.trim();
+    if (c != "")
+    {
+      DataList.push_back(c);
+    }
+  }
+
+  int listSize = DataList.size();
+
+  if (listSize > 2)
+  {
+    ActUponData(DataList);
+  }
+
+  if (listSize > 0)
+  {
+    for (int i = 0; i < listSize; i++)
+    {
+      Serial.println(DataList[i]);
+    }
+    Serial.println(listSize);
+  }
+
+  delay(20);
+}
+
+DelayHandler SerialChecker(CheckSerialData);
 
 void loop()
 {
-  PrintStuff.DelayInParallel(5000);
-  delay(1000);
-  Serial.println("TEST");
-  delay(1000);
+  SerialChecker.DelayWhileExecuting(2500);
+  Serial.println("Testes");
 }

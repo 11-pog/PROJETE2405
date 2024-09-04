@@ -8,6 +8,8 @@
 
 // Bibliotecas privadas do projeto
 #include <Common.h>
+#include <TimedEvents.h>
+#include <DelayHandler.h>
 
 // Definições de constantes
 #define DHT_PIN 12
@@ -29,7 +31,7 @@ namespace Flash // Namespace pra guardar o objeto preferences (Pra ficar bonitin
 
 // Object instantiation
 
-Common::Time::Clock ESPClock(timezone, daysavetime);
+Common::Time::Clock ESPClock(timezone);
 Common::Sensor::DHT_Sensor DHTSensor(DHT_PIN, DHT_TYPE);
 Common::Sensor::Ultrasonic_Sensor USSensor(trigPin, echoPin);
 

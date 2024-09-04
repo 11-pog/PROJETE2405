@@ -35,36 +35,6 @@ namespace Common::Time
     UpdateTime();
     return localTime;
   }
-
-  //Class DelayHandler
-  //Publics
-  DelayHandler::DelayHandler(std::function<void()> Task) : Task(Task) {}
-
-  void DelayHandler::DelayInParallel(unsigned long delay)
-  {
-    UpdateLastTime();
-
-    while (!HasDelayElapsed(delay))
-    {
-      Task();
-    }
-  }
-
-  void DelayHandler::SwitchTask(std::function<void()> Task)
-  {
-    this->Task = Task;
-  }
-
-  //Privates
-  bool DelayHandler::HasDelayElapsed(unsigned long delay)
-  {
-    return millis() - lastTime > delay;
-  }
-
-  void DelayHandler::UpdateLastTime()
-  {
-    lastTime = millis();
-  }
 }
 
 namespace Common::Sensor

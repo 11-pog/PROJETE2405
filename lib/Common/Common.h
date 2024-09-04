@@ -13,7 +13,7 @@ namespace Common
         class Clock
         {
         public:
-            Clock(long timezone, byte daysavetime);
+            Clock(long timezone, byte daysavetime = 0);
             void SyncTime();
             void UpdateTime();
             void PrintDateTime();
@@ -23,20 +23,6 @@ namespace Common
             LocalTime localTime;
             long timezone;
             byte daysavetime;
-        };
-
-        class DelayHandler
-        {
-        public:
-            DelayHandler(std::function<void()> Task);
-            void DelayInParallel(unsigned long timeInMillis);
-            void SwitchTask(std::function<void()> Task);
-
-        private:
-            std::function<void()> Task;
-            bool HasDelayElapsed(unsigned long timeInMillis);
-            void UpdateLastTime();
-            unsigned long lastTime;
         };
     }
 
