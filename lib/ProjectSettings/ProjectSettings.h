@@ -6,6 +6,9 @@
 #include <WiFi.h>
 #include <time.h>
 
+// Bibliotecas do C++
+#include <vector>
+
 // Bibliotecas privadas do projeto
 #include <Common.h>
 #include <TimedEvents.h>
