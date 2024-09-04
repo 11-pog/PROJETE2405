@@ -6,20 +6,17 @@
 #include <WiFi.h>
 #include <time.h>
 
-// Bibliotecas do C++
-#include <vector>
-
 // Bibliotecas privadas do projeto
 #include <Common.h>
 #include <TimedEvents.h>
-#include <DelayHandler.h>
+#include <TimerActions.h>
 
 // Definições de constantes
 #define DHT_PIN 12
 #define DHT_TYPE DHT22
 
-const char *wifiId = "Anizio CPereira"; // Nome da internet
-const char *wifiPassword = "25030917";  // Senha da internet
+const char *wifiId = "internet"; // Nome da internet
+const char *wifiPassword = "internet";  // Senha da internet
 
 const byte trigPin = 5;  // Pino do Trigger
 const byte echoPin = 18; // Pino do Echo
@@ -34,8 +31,8 @@ namespace Flash // Namespace pra guardar o objeto preferences (Pra ficar bonitin
 
 // Object instantiation
 
-Common::Time::Clock ESPClock(timezone);
-Common::Sensor::DHT_Sensor DHTSensor(DHT_PIN, DHT_TYPE);
-Common::Sensor::Ultrasonic_Sensor USSensor(trigPin, echoPin);
+Time::Clock ESPClock(timezone);
+Sensor::DHT_Sensor DHTSensor(DHT_PIN, DHT_TYPE);
+Sensor::Ultrasonic_Sensor USSensor(trigPin, echoPin);
 
 #endif
