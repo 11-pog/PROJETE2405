@@ -9,8 +9,6 @@ void setup()
 
   pinMode(MOTOR_PIN, OUTPUT);
 
-  Flash::Schedule.begin("Schedule", false);
-
   WiFi.begin(wifiId, wifiPassword);
 
   Serial.print("Conectando");
@@ -30,6 +28,7 @@ void setup()
   Serial.println("Conectado!");
 
   ESPClock.SyncTime();
+  
 }
 
 TimerActions SerialChecker(CheckSerialData);

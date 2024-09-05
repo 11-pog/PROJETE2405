@@ -8,15 +8,15 @@ void ActUponData(std::vector<String> Data)
         Serial.println(Data[2]);
     }
 
-    if (Data.size() >= 2 && Data[0] == "MOTOR")
+    if (Data.size() >= 1)
     {
-        if (Data[1] == "ON")
+        if (Data[0] == "ON")
         {
             Serial.println("Motor is now ON");
             digitalWrite(MOTOR_PIN, 1);
         }
 
-        else if (Data[1] == "OFF")
+        else if (Data[0] == "OFF")
         {
             Serial.println("Motor is now OFF");
             digitalWrite(MOTOR_PIN, 0);

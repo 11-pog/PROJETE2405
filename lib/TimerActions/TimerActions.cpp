@@ -10,31 +10,32 @@ void TimerActions::WaitWhileExecuting(unsigned long delay)
     }
 }
 
-void TimerActions::SwitchTask(std::function<void()> executableTask)
+void TimerActions::SwitchTask(std::function<void()> newTask)
 {
-    this->executableTask = executableTask;
+    this->executableTask = newTask;
 }
 
-// Privates
 bool TimerActions::IsTimerUp(unsigned long delay)
 {
     SetLastTimeIfZero();
 
     if (millis() - lastTime > delay)
     {
-        lastTime = 0;
+        ResetTimer();
         return true;
     }
 
     return false;
 }
 
+void TimerActions::ResetTimer()
+{
+    lastTime = 0;
+}
+
+
+// Privates
 void TimerActions::SetLastTimeIfZero()
 {
     lastTime = lastTime ? lastTime : millis();
-}
-
-void TimerActions::ResetTimer()
-{
-    lastTime = millis();
 }

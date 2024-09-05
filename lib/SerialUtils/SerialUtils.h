@@ -5,7 +5,7 @@
 #include <TimerActions.h>
 
 #define DEF_SERIAL_TIMEOUT 1250U
-#define MOTOR_PIN 19U
+#define MOTOR_PIN 22U
 
 void ActUponData(std::vector<String> Data);
 void CheckSerialData();
