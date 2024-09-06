@@ -15,6 +15,7 @@ struct EventTime
 };
 
 typedef std::pair<EventTime, unsigned short> EventData;
+typedef std::vector<EventData> EventList;
 
 class EventScheduler
 {
@@ -23,14 +24,19 @@ public:
     void Evaluate(DateTime now, std::function<void(unsigned short)> Action);
     void Schedule(DateTime ScheduledTime, unsigned short extra = 0);
 
+    //Yet-To-Define Functions
+    void UnSchedule();
+    void ReSchedule();
+    void ResetFlash();
+
 private:
-    std::pair<bool, unsigned short> EvaluateConditions(DateTime now);
+    std::pair<bool, unsigned short> IsEventDue(DateTime now);
     bool done;
     void SaveToFlash();
     EventData GetNextScheduledEvent();
     Preferences Flash;
-    std::vector<EventData> GetDataFromFlash();
-    std::vector<EventData> ScheduleList;
+    EventList GetDataFromFlash();
+    EventList ScheduleList;
 };
 
 #endif

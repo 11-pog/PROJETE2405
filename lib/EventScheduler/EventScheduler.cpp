@@ -2,12 +2,13 @@
 
 EventScheduler::EventScheduler()
 {
-    Flash.begin("Schedule", false);
+    Flash.begin("Schedule", false); // This is preferences.h btw
+    this->ScheduleList = GetDataFromFlash();
 }
 
 void EventScheduler::SaveToFlash()
 {
-    unsigned long size = ScheduleList.size() * sizeof(std::pair<EventTime, unsigned short>);
+    unsigned long size = ScheduleList.size() * sizeof(EventData);
 
     byte serializedScheduler[size];
     memcpy(serializedScheduler, &ScheduleList, size);
@@ -15,20 +16,34 @@ void EventScheduler::SaveToFlash()
     Flash.putBytes("schedule", serializedScheduler, size);
 }
 
-std::vector<EventData> EventScheduler::GetDataFromFlash()
+EventList EventScheduler::GetDataFromFlash()
 {
-    if (Flash.isKey("schedule"))
+    if (!Flash.isKey("schedule"))
     {
-        unsigned long size = Flash.getBytes("schedule", nullptr, 0);
-        byte unserializedScheduler[] = new(size);
+        return EventList();
     }
-    return std::vector<EventData>();
+
+    unsigned long size = Flash.getBytes("schedule", nullptr, 0);
+    byte *unserializedScheduler = new byte[size];
+    Flash.getBytes("schedule", unserializedScheduler, size);
+
+    EventList eventData;
+
+    for (unsigned long i = 0; i < size; i += sizeof(EventData))
+    {
+        EventData temp;
+        memcpy(&temp, unserializedScheduler + i, sizeof(EventData));
+        eventData.push_back(temp);
+    }
+
+    delete[] unserializedScheduler;
+    return eventData;
 }
 
 void EventScheduler::Schedule(DateTime ScheduledTime, unsigned short extra)
 {
     EventTime eventTime;
-    
+
     eventTime.Hours = ScheduledTime.tm_hour;
     eventTime.Minutes = ScheduledTime.tm_min;
 
@@ -38,7 +53,7 @@ void EventScheduler::Schedule(DateTime ScheduledTime, unsigned short extra)
     SaveToFlash();
 }
 
-std::pair<bool, unsigned short> EventScheduler::EvaluateConditions(DateTime now)
+std::pair<bool, unsigned short> EventScheduler::IsEventDue(DateTime now)
 {
     EventData eventData = GetNextScheduledEvent();
     EventTime eventTime = eventData.first;
@@ -56,17 +71,14 @@ EventData EventScheduler::GetNextScheduledEvent()
 
 void EventScheduler::Evaluate(DateTime now, std::function<void(unsigned short)> action)
 {
-    std::pair<bool, unsigned short> result = EvaluateConditions(now);
+    std::pair<bool, unsigned short> result = IsEventDue(now);
 
-    if (result.first)
+    if (result.first && !done)
     {
-        if (!done)
-        {
-            action(result.second);
-            done = true;
-        }
+        action(result.second);
+        done = true;
     }
-    else
+    else if (!result.first)
     {
         done = false;
     }
