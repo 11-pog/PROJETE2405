@@ -6,6 +6,16 @@
 #include <CppTypeDefs.h>
 #include <Preferences.h>
 
+#include <vector>
+
+struct EventTime
+{
+    unsigned char Hours;
+    unsigned char Minutes;
+};
+
+typedef std::pair<EventTime, unsigned short> EventData;
+
 class EventScheduler
 {
 public:
@@ -14,8 +24,12 @@ public:
     void Schedule(DateTime ScheduledTime, unsigned short extra = 0);
 
 private:
+    std::pair<bool, unsigned short> EvaluateConditions(DateTime now);
+    bool done;
+    void UpdateFlash();
+    EventData GetNextScheduledEvent();
     Preferences Flash;
-    struct EventTime;
+    std::vector<EventData> ScheduleList;
 };
 
 #endif

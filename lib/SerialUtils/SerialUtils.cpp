@@ -1,22 +1,22 @@
 #include <SerialUtils.h>
 
-void ActUponData(std::vector<String> Data)
+void ActUponData(std::vector<String> data)
 {
-    if (Data.size() > 2 && (Data[0] == "ADD" && Data[1] == "SCHEDULE"))
+    if (data.size() > 2 && (data[0] == "ADD" && data[1] == "SCHEDULE"))
     {
         Serial.print("Adding to schedule: ");
-        Serial.println(Data[2]);
+        Serial.println(data[2]);
     }
 
-    if (Data.size() >= 1)
+    if (data.size() >= 1)
     {
-        if (Data[0] == "ON")
+        if (data[0] == "ON")
         {
             Serial.println("Motor is now ON");
             digitalWrite(MOTOR_PIN, 1);
         }
 
-        else if (Data[0] == "OFF")
+        else if (data[0] == "OFF")
         {
             Serial.println("Motor is now OFF");
             digitalWrite(MOTOR_PIN, 0);
@@ -24,72 +24,67 @@ void ActUponData(std::vector<String> Data)
     }
 }
 
-std::vector<String> ReadSerialData(unsigned int timeOut)
+void PushFragment(std::vector<String> &data, String &dataFragment)
 {
-    std::vector<String> Data;
-    String DataFragment = "";
-    TimerActions TimeOut;
+    dataFragment.trim();
 
-    auto PushFragment = [&Data, &DataFragment]()
+    if (!dataFragment.isEmpty())
     {
-        Data.push_back(DataFragment);
-        DataFragment = "";
-    };
+        data.push_back(dataFragment);
+        dataFragment = "";
+    }
+}
+
+bool ProcessSerialFragment(std::vector<String> &data, String &dataFragment, TimerActions &timeOut)
+{
+    char c = Serial.read();
+
+    if (c == '\n')
+    {
+        PushFragment(data, dataFragment);
+        return true;
+    }
+
+    if (dataFragment == "__EOT__")
+    {
+        return true;
+    }
+
+    if (c == ' ' && !dataFragment.isEmpty())
+    {
+        PushFragment(data, dataFragment);
+    }
+    else if (c != ' ')
+    {
+        dataFragment += c;
+    }
+
+    timeOut.ResetTimer();
+    return false;
+}
+
+std::vector<String> ReadSerialData(unsigned int timeOutValue)
+{
+    std::vector<String> data;
+    String dataFragment = "";
+    TimerActions timeOut;
 
     while (true)
     {
-        char c;
-
-        if (Serial.available())
-        {
-            c = Serial.read();
-
-            if (c == '\n' || c == '\u0004')
-            {
-                PushFragment();
-                break;
-            }
-
-            if (c == ' ' && !DataFragment.isEmpty())
-            {
-                PushFragment();
-            }
-            else if (c != ' ')
-            {
-                DataFragment += c;
-            }
-
-            TimeOut.ResetTimer();
-        }
-
-        if (TimeOut.IsTimerUp(timeOut))
+        if (timeOut.IsTimerUp(timeOutValue) || (Serial.available() && ProcessSerialFragment(data, dataFragment, timeOut)))
         {
             break;
         }
     }
 
-    return Data;
+    return data;
 }
 
 // Testes
 void CheckSerialData()
 {
-    std::vector<String> DataList;
-
     if (Serial.available())
     {
-        DataList = ReadSerialData();
-        int listSize = DataList.size();
-
-        ActUponData(DataList);
-
-        if (listSize > 0)
-        {
-            for (int i = 0; i < listSize; i++)
-            {
-                Serial.println(DataList[i]);
-            }
-            Serial.println(listSize);
-        }
+        ActUponData(ReadSerialData());
     }
 }
