@@ -5,20 +5,37 @@ EventScheduler::EventScheduler()
     Flash.begin("Schedule", false);
 }
 
-void EventScheduler::UpdateFlash()
+void EventScheduler::SaveToFlash()
 {
-    //Flash.putBytes("SystemSchedule", ScheduleList);
+    unsigned long size = ScheduleList.size() * sizeof(std::pair<EventTime, unsigned short>);
+
+    byte serializedScheduler[size];
+    memcpy(serializedScheduler, &ScheduleList, size);
+
+    Flash.putBytes("schedule", serializedScheduler, size);
+}
+
+std::vector<EventData> EventScheduler::GetDataFromFlash()
+{
+    if (Flash.isKey("schedule"))
+    {
+        unsigned long size = Flash.getBytes("schedule", nullptr, 0);
+        byte unserializedScheduler[] = new(size);
+    }
+    return std::vector<EventData>();
 }
 
 void EventScheduler::Schedule(DateTime ScheduledTime, unsigned short extra)
 {
     EventTime eventTime;
-
+    
     eventTime.Hours = ScheduledTime.tm_hour;
     eventTime.Minutes = ScheduledTime.tm_min;
 
     EventData eventData(eventTime, extra);
     ScheduleList.push_back(eventData);
+
+    SaveToFlash();
 }
 
 std::pair<bool, unsigned short> EventScheduler::EvaluateConditions(DateTime now)

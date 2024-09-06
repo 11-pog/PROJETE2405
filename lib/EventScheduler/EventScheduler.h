@@ -26,9 +26,10 @@ public:
 private:
     std::pair<bool, unsigned short> EvaluateConditions(DateTime now);
     bool done;
-    void UpdateFlash();
+    void SaveToFlash();
     EventData GetNextScheduledEvent();
     Preferences Flash;
+    std::vector<EventData> GetDataFromFlash();
     std::vector<EventData> ScheduleList;
 };
 
