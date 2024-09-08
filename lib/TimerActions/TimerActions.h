@@ -7,7 +7,7 @@ class TimerActions
 {
 public:
     TimerActions(std::function<void()> executableTask = std::function<void()>());
-    void WaitWhileExecuting(unsigned long timeInMillis);
+    void ExecuteWhileWaiting(unsigned long timeInMillis);
     void SwitchTask(std::function<void()> executableTask);
     bool IsTimerUp(unsigned long timeInMillis);
     void ResetTimer();

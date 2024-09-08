@@ -44,8 +44,6 @@ void EventScheduler::TestPacker()
     return;
 }
 
-
-
 void EventScheduler::SaveToFlash()
 {
     MsgPack::Packer packer;
@@ -121,47 +119,52 @@ void EventScheduler::Schedule(EventTime ToSchedule, unsigned short extra)
     ScheduleList.push_back(eventData);
 
     SaveToFlash();
+
+    Done = true;
 }
 
-std::pair<bool, unsigned short> EventScheduler::IsEventDue(DateTime now)
+std::pair<bool, unsigned short> EventScheduler::IsEventDue(DateTime now_tm)
 {
-    EventData eventData = GetNextScheduledEvent(now);
-    EventTime eventTime = eventData.Event;
-
-    bool isHour = eventTime.Hours == now.tm_hour;
-    bool isMinute = eventTime.Minutes == now.tm_min;
-
-    return std::make_pair(isHour && isMinute, eventData.Extra);
-}
-
-EventScheduler::EventData EventScheduler::GetNextScheduledEvent(DateTime now_tm)
-{
-    std::sort(ScheduleList.begin(), ScheduleList.end());
-
     EventTime now(now_tm.tm_hour, now_tm.tm_min);
 
-    for(EventData data : ScheduleList)
-    {
-        if(data.Event >= now)
-        {
-            return data;
-        }
-    }
+    GetNextScheduledEvent(now);
+    EventData eventData = NextEvent;
+    EventTime eventTime = eventData.Event;
 
-    return ScheduleList[0];
+    return std::make_pair(now == eventTime, eventData.Extra);
+}
+
+void EventScheduler::GetNextScheduledEvent(EventTime now)
+{
+    if (Done)
+    {
+        std::sort(ScheduleList.begin(), ScheduleList.end());
+
+        for (EventData data : ScheduleList)
+        {
+            if (data.Event > now)
+            {
+                NextEvent = data;
+                Done = false;
+                return;
+            }
+        }
+
+        NextEvent = ScheduleList[0];
+    }
 }
 
 void EventScheduler::Evaluate(DateTime now, std::function<void(unsigned short)> action)
 {
     std::pair<bool, unsigned short> result = IsEventDue(now);
 
-    if (result.first && !done)
+    if (result.first && !Done)
     {
         action(result.second);
-        done = true;
+        Done = true;
     }
     else if (!result.first)
     {
-        done = false;
+        Done = false;
     }
 }

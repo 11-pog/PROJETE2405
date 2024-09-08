@@ -2,7 +2,7 @@
 
 EventScheduler Events;
 
-void AddScheduleIfValid(String data)
+void AddScheduleIfValid(String data, unsigned short extra)
 {
     int colonIndex = data.indexOf(':');
     if (colonIndex != -1)
@@ -13,13 +13,13 @@ void AddScheduleIfValid(String data)
         int hourInt = hours.toInt();
         int minuteInt = minutes.toInt();
 
-        bool isHourValid = (hourInt != 0 || hours == "0") && hourInt >= 0 && hourInt < 24;
-        bool isMinuteValid = (minuteInt != 0 || minutes == "0") && minuteInt >= 0 && minuteInt < 60;
+        bool isHourValid = (hourInt != 0 || hours == "0" || hours == "00") && hourInt >= 0 && hourInt < 24;
+        bool isMinuteValid = (minuteInt != 0 || minutes == "0" || minutes == "00") && minuteInt >= 0 && minuteInt < 60;
 
         if (isHourValid && isMinuteValid)
         {
             EventTime newEvent(hourInt, minuteInt);
-            Events.Schedule(newEvent);
+            Events.Schedule(newEvent, extra);
             return;
         }
     }
@@ -29,19 +29,20 @@ void AddScheduleIfValid(String data)
 
 void HandleCommand(List<String> data)
 {
-    if (data.size() == 3)
+    if (data.size() >= 3)
     {
         if (data[0] == "ADD" && data[1] == "SCHEDULE")
         {
             Serial.print("Adding to schedule: ");
             Serial.println(data[2]);
 
-            AddScheduleIfValid(data[2]);
+            unsigned short extra = data.size() == 4 ? data[3].toInt() : 0;
+
+            AddScheduleIfValid(data[2], extra);
         }
 
         if (data[0] == "PRINT" && data[1] == "SCHEDULE" && data[2] == "ALL")
         {
-            Serial.println("ok");
             Events.PrintScheduleList();
         }
     }
@@ -49,8 +50,8 @@ void HandleCommand(List<String> data)
     if (data.size() == 2)
     {
         if (data[0] == "TEST" && data[1] == "PACKER")
-        {   
-            Serial.println("Testing.");
+        {
+            Serial.println("Testing...");
             Events.TestPacker();
         }
 
@@ -60,7 +61,7 @@ void HandleCommand(List<String> data)
             Events.ResetFlash();
         }
 
-        if (data[0] == "RESTART" && data[1] == "ESP")
+        if (data[0] == "ESP" && data[1] == "RESTART")
         {
             Serial.println("Esp should restart ");
             delay(1000);
@@ -144,7 +145,6 @@ List<String> ReadSerialData(unsigned int timeOutValue)
     List<String> data;
     String dataFragment = "";
     TimerActions timeOut;
-
     bool spaceIgnoreMode;
 
     while (!(timeOut.IsTimerUp(timeOutValue) || (Serial.available() && ProcessFragment(data, dataFragment, timeOut, spaceIgnoreMode))))
@@ -160,12 +160,6 @@ void CheckSerialData()
 {
     if (Serial.available())
     {
-        List<String> Commands = ReadSerialData();
-        HandleCommand(Commands);
-
-        for (String Command : Commands)
-        {
-            Serial.println(Command);
-        }
+        HandleCommand(ReadSerialData());
     }
 }

@@ -38,10 +38,12 @@ void Place(unsigned short Holder)
 
   unsigned short timeToHoldON = Holder ? Holder : 5000;
 
+  Serial.println("Motor ON");
   digitalWrite(MOTOR_PIN, 1);
 
   delay (timeToHoldON);
 
+  Serial.println("Motor OFF");
   digitalWrite(MOTOR_PIN, 0);
 }
 
@@ -57,6 +59,6 @@ TimerActions SerialChecker(AsyncTasks);
 
 void loop()
 {
-  SerialChecker.WaitWhileExecuting(5000);
+  SerialChecker.ExecuteWhileWaiting(1000);
   ESPClock.PrintDateTime();
 }

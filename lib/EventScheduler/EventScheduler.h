@@ -21,6 +21,11 @@ struct EventTime
         return Hours == other.Hours && Minutes == other.Minutes;
     }
 
+    bool operator!=(const EventTime &other) const
+    {
+        return Hours != other.Hours && Minutes != other.Minutes;
+    }
+
     bool operator<=(const EventTime &other) const
     {
         return Hours <= other.Hours && Minutes <= other.Minutes;
@@ -29,6 +34,16 @@ struct EventTime
     bool operator>=(const EventTime &other) const
     {
         return Hours >= other.Hours && Minutes >= other.Minutes;
+    }
+
+    bool operator<(const EventTime &other) const
+    {
+        return Hours < other.Hours || Hours == other.Hours && Minutes < other.Minutes;
+    }
+
+    bool operator>(const EventTime &other) const
+    {
+        return Hours > other.Hours || Hours == other.Hours && Minutes > other.Minutes;
     }
 
     MSGPACK_DEFINE(Hours, Minutes);
@@ -95,12 +110,14 @@ public:
 
 private:
     std::pair<bool, unsigned short> IsEventDue(DateTime now);
-    bool done;
     void SaveToFlash();
-    EventData GetNextScheduledEvent(DateTime now);
-    Preferences Flash;
+    void GetNextScheduledEvent(EventTime now);
     EventList GetDataFromFlash();
+
+    bool Done;
+    Preferences Flash;
     EventList ScheduleList;
+    EventData NextEvent;
 };
 
 using EventList = typename EventScheduler::EventList;

@@ -2,7 +2,7 @@
 
 TimerActions::TimerActions(std::function<void()> executableTask) : executableTask(executableTask) {}
 
-void TimerActions::WaitWhileExecuting(unsigned long delay)
+void TimerActions::ExecuteWhileWaiting(unsigned long delay)
 {
     while (!IsTimerUp(delay))
     {
