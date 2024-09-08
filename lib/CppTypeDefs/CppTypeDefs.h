@@ -1,11 +1,19 @@
 #ifndef CppTypeDefs_H
 #define CppTypeDefs_H
 
-typedef u_int8_t byte;
-typedef int8_t sbyte;
-typedef std::string string;
+#include <vector>
 
-typedef struct tm LocalTime;
-typedef tm DateTime;
+using byte = unsigned char;
+using sbyte = char;
+using string = std::string;
+
+using LocalTime = struct tm;
+using DateTime = tm;
+
+template <typename T>
+using List = std::vector<T>;
+
+template <typename T>
+using Action = std::function<T>;
 
 #endif

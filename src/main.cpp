@@ -6,6 +6,7 @@
 void setup()
 {
   Serial.begin(9600);
+  Events.begin();
 
   pinMode(MOTOR_PIN, OUTPUT);
 
@@ -28,13 +29,34 @@ void setup()
   Serial.println("Conectado!");
 
   ESPClock.SyncTime();
-  
 }
 
-TimerActions SerialChecker(CheckSerialData);
+void Place(unsigned short Holder)
+{
+  Serial.println("In fact, this event has been triggered: ");
+  Serial.println(Holder);
+
+  unsigned short timeToHoldON = Holder ? Holder : 5000;
+
+  digitalWrite(MOTOR_PIN, 1);
+
+  delay (timeToHoldON);
+
+  digitalWrite(MOTOR_PIN, 0);
+}
+
+void AsyncTasks()
+{
+  CheckSerialData();
+  Events.Evaluate(ESPClock.GetCurrentTime(), Place);
+
+  delay(2);
+}
+
+TimerActions SerialChecker(AsyncTasks);
 
 void loop()
 {
   SerialChecker.WaitWhileExecuting(5000);
-  Serial.println(".");
+  ESPClock.PrintDateTime();
 }

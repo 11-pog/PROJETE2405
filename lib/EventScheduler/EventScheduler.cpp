@@ -1,53 +1,123 @@
 #include <EventScheduler.h>
 
-EventScheduler::EventScheduler()
+void EventScheduler::begin()
 {
-    Flash.begin("Schedule", false); // This is preferences.h btw
+    Serial.println("This is, indeed, initializing.");
+
+    Flash.begin("Schedule"); // This is preferences.h btw
     this->ScheduleList = GetDataFromFlash();
+    PrintScheduleList();
 }
+
+void EventScheduler::TestPacker()
+{
+    MsgPack::Packer packer;
+    packer.serialize(ScheduleList);
+
+    unsigned int firstChecksum = CRC32::calculate(packer.data(), packer.size());
+
+    MsgPack::Unpacker unpacker;
+    unpacker.feed(packer.data(), packer.size());
+
+    EventList dd;
+
+    unpacker.deserialize(dd);
+
+    MsgPack::Packer packer2;
+    packer2.serialize(dd);
+
+    unsigned int secondChecksum = CRC32::calculate(packer2.data(), packer2.size());
+
+    if (firstChecksum == secondChecksum)
+    {
+        Serial.println("Checksum Matches: ");
+        Serial.println(firstChecksum);
+    }
+
+    if (ScheduleList == dd)
+    {
+        Serial.println("Data Matches");
+        return;
+    }
+
+    Serial.println("Failed Serialization");
+    return;
+}
+
+
 
 void EventScheduler::SaveToFlash()
 {
-    unsigned long size = ScheduleList.size() * sizeof(EventData);
+    MsgPack::Packer packer;
+    packer.serialize(ScheduleList);
 
-    byte serializedScheduler[size];
-    memcpy(serializedScheduler, &ScheduleList, size);
+    unsigned int checksum = CRC32::calculate(packer.data(), packer.size());
 
-    Flash.putBytes("schedule", serializedScheduler, size);
+    Flash.putBytes("schedule", packer.data(), packer.size());
+    Flash.putInt("checksum", checksum);
 }
 
 EventList EventScheduler::GetDataFromFlash()
 {
     if (!Flash.isKey("schedule"))
     {
+        Serial.println("No key 'schedule' found.");
         return EventList();
     }
 
-    unsigned long size = Flash.getBytes("schedule", nullptr, 0);
-    byte *unserializedScheduler = new byte[size];
-    Flash.getBytes("schedule", unserializedScheduler, size);
+    unsigned long size = Flash.getBytesLength("schedule");
 
-    EventList eventData;
+    byte *data = new byte[size];
+    Flash.getBytes("schedule", data, size);
 
-    for (unsigned long i = 0; i < size; i += sizeof(EventData))
+    unsigned int checksum = CRC32::calculate(data, size);
+    unsigned int storedChecksum = Flash.getInt("checksum");
+
+    MsgPack::Unpacker unpacker;
+    EventList eventList;
+
+    unpacker.feed(data, size);
+    unpacker.deserialize(eventList);
+
+    delete[] data;
+    if (checksum == storedChecksum)
     {
-        EventData temp;
-        memcpy(&temp, unserializedScheduler + i, sizeof(EventData));
-        eventData.push_back(temp);
+        return eventList;
     }
 
-    delete[] unserializedScheduler;
-    return eventData;
+    Serial.println("ERROR: Possible data Corruption");
+    Flash.clear();
+    return EventList();
 }
 
-void EventScheduler::Schedule(DateTime ScheduledTime, unsigned short extra)
+void EventScheduler::PrintScheduleList()
 {
-    EventTime eventTime;
+    Serial.println("Printing Current Itens:");
+    Serial.print("\n");
+    for (EventData Data : ScheduleList)
+    {
+        Serial.print("Hours: ");
+        Serial.println(Data.Event.Hours);
 
-    eventTime.Hours = ScheduledTime.tm_hour;
-    eventTime.Minutes = ScheduledTime.tm_min;
+        Serial.print("Minutes: ");
+        Serial.println(Data.Event.Minutes);
 
-    EventData eventData(eventTime, extra);
+        Serial.print("Extra: ");
+        Serial.println(Data.Extra);
+
+        Serial.println("\n\n");
+    }
+}
+
+void EventScheduler::ResetFlash()
+{
+    Flash.clear();
+    ScheduleList = EventList();
+}
+
+void EventScheduler::Schedule(EventTime ToSchedule, unsigned short extra)
+{
+    EventData eventData(ToSchedule, extra);
     ScheduleList.push_back(eventData);
 
     SaveToFlash();
@@ -55,18 +125,30 @@ void EventScheduler::Schedule(DateTime ScheduledTime, unsigned short extra)
 
 std::pair<bool, unsigned short> EventScheduler::IsEventDue(DateTime now)
 {
-    EventData eventData = GetNextScheduledEvent();
-    EventTime eventTime = eventData.first;
+    EventData eventData = GetNextScheduledEvent(now);
+    EventTime eventTime = eventData.Event;
 
     bool isHour = eventTime.Hours == now.tm_hour;
     bool isMinute = eventTime.Minutes == now.tm_min;
 
-    return std::make_pair(isHour && isMinute, eventData.second);
+    return std::make_pair(isHour && isMinute, eventData.Extra);
 }
 
-EventData EventScheduler::GetNextScheduledEvent()
+EventScheduler::EventData EventScheduler::GetNextScheduledEvent(DateTime now_tm)
 {
-    return EventData(); // PlaceHolder
+    std::sort(ScheduleList.begin(), ScheduleList.end());
+
+    EventTime now(now_tm.tm_hour, now_tm.tm_min);
+
+    for(EventData data : ScheduleList)
+    {
+        if(data.Event >= now)
+        {
+            return data;
+        }
+    }
+
+    return ScheduleList[0];
 }
 
 void EventScheduler::Evaluate(DateTime now, std::function<void(unsigned short)> action)

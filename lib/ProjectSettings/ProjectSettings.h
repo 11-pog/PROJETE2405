@@ -7,7 +7,6 @@
 
 // Bibliotecas privadas do projeto
 #include <Common.h>
-#include <EventScheduler.h>
 #include <TimerActions.h>
 #include <SerialUtils.h>
 

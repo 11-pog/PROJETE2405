@@ -5,38 +5,104 @@
 #include <time.h>
 #include <CppTypeDefs.h>
 #include <Preferences.h>
-
-#include <vector>
+#include <msgpack.h>
+#include <CRC32.h>
+#include <algorithm>
 
 struct EventTime
 {
-    unsigned char Hours;
-    unsigned char Minutes;
-};
+    byte Hours;
+    byte Minutes;
 
-typedef std::pair<EventTime, unsigned short> EventData;
-typedef std::vector<EventData> EventList;
+    EventTime(byte hours = 12, byte minutes = 0) : Hours(hours), Minutes(minutes) {}
+
+    bool operator==(const EventTime &other) const
+    {
+        return Hours == other.Hours && Minutes == other.Minutes;
+    }
+
+    bool operator<=(const EventTime &other) const
+    {
+        return Hours <= other.Hours && Minutes <= other.Minutes;
+    }
+
+    bool operator>=(const EventTime &other) const
+    {
+        return Hours >= other.Hours && Minutes >= other.Minutes;
+    }
+
+    MSGPACK_DEFINE(Hours, Minutes);
+};
 
 class EventScheduler
 {
-public:
-    EventScheduler();
-    void Evaluate(DateTime now, std::function<void(unsigned short)> Action);
-    void Schedule(DateTime ScheduledTime, unsigned short extra = 0);
+private: // Structs
+    struct EventData
+    {
+        EventTime Event;
+        unsigned short Extra;
 
-    //Yet-To-Define Functions
+        EventData(EventTime event = EventTime(), unsigned short extra = 0) : Event(event), Extra(extra) {}
+
+        bool operator==(const EventData &other) const
+        {
+            return Event == other.Event && Extra == other.Extra;
+        }
+
+        bool operator!=(const EventData &other) const
+        {
+            return !(Event == other.Event && Extra == other.Extra);
+        }
+
+        bool operator<=(const EventData &other) const
+        {
+            return Event <= other.Event;
+        }
+
+        bool operator>(const EventData &other) const
+        {
+            return !(Event <= other.Event);
+        }
+
+        bool operator>=(const EventData &other) const
+        {
+            return Event >= other.Event;
+        }
+
+        bool operator<(const EventData &other) const
+        {
+            return !(Event >= other.Event);
+        }
+
+        MSGPACK_DEFINE(Event, Extra);
+    };
+
+public:
+    void begin();
+
+    void Evaluate(DateTime now, std::function<void(unsigned short)> Action);
+    void Schedule(EventTime ScheduledTime, unsigned short extra = 0);
+
+    void TestPacker();
+    void ResetFlash();
+    void PrintScheduleList();
+
+    // Yet-To-Define Functions
     void UnSchedule();
     void ReSchedule();
-    void ResetFlash();
+
+    using EventList = List<EventData>;
 
 private:
     std::pair<bool, unsigned short> IsEventDue(DateTime now);
     bool done;
     void SaveToFlash();
-    EventData GetNextScheduledEvent();
+    EventData GetNextScheduledEvent(DateTime now);
     Preferences Flash;
     EventList GetDataFromFlash();
     EventList ScheduleList;
 };
+
+using EventList = typename EventScheduler::EventList;
 
 #endif
