@@ -44,11 +44,14 @@ void SerialHandler::ReScheduleIfValid(String data, unsigned int ID)
     if (validatedTime.Hours != 255 && ID != 0) // 255, AKA byte equivalent of -1, literally the best representation of "this code isnt valid" i could find
     {
         Serial.print("Rescheduling: ");
-        Serial.println(ID);
+        Serial.print(ID);
         Serial.print(" to ");
         Serial.println(data);
+        Serial.print('\n');
 
-        Events->ReSchedule(ID, validatedTime);
+        Serial.print("New ID: ");
+        Serial.println(Events->ReSchedule(ID, validatedTime));
+
         return;
     }
 
