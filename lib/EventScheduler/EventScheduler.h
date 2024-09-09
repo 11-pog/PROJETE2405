@@ -56,6 +56,8 @@ private: // Structs
     {
         EventTime Event;
         unsigned short Extra;
+        bool Executed;
+        byte ID;
 
         EventData(EventTime event = EventTime(), unsigned short extra = 0) : Event(event), Extra(extra) {}
 

@@ -9,9 +9,26 @@
 #define DEF_SERIAL_TIMEOUT 1250U
 #define MOTOR_PIN 22U
 
-extern EventScheduler Events;
+class SerialHandler
+{
+public:
+    SerialHandler(EventScheduler *events) : Events(events) {}
+    List<String> ReadSerialData(unsigned int timeOut = DEF_SERIAL_TIMEOUT);
+    void CheckSerialData(Action<void(List<String>)> Action);
+    void CheckSerialData();
 
-List<String> ReadSerialData(unsigned int timeOut = DEF_SERIAL_TIMEOUT);
-void CheckSerialData();
+private:
+    void AddScheduleIfValid(String data, unsigned short extra);
+    void HandleCommand(List<String> data);
+    void PushFragment();
+    bool ProcessFragment(List<String> &data, String &dataFragment);
 
-#endif // !SerialUtils_H
+    TimerActions timeOut;
+    bool spaceIgnoreMode;
+    String dataFragment;
+    List<String> data;
+
+    EventScheduler *Events;
+};
+
+#endif

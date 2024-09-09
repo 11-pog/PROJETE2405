@@ -29,4 +29,7 @@ Time::Clock ESPClock(timezone);
 Sensor::DHT_Sensor DHTSensor(DHT_PIN, DHT_TYPE);
 Sensor::Ultrasonic_Sensor USSensor(trigPin, echoPin);
 
+EventScheduler Events;
+SerialHandler SerialH(&Events);
+
 #endif

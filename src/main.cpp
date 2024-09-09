@@ -41,7 +41,7 @@ void Place(unsigned short Holder)
   Serial.println("Motor ON");
   digitalWrite(MOTOR_PIN, 1);
 
-  delay (timeToHoldON);
+  delay(timeToHoldON);
 
   Serial.println("Motor OFF");
   digitalWrite(MOTOR_PIN, 0);
@@ -49,7 +49,8 @@ void Place(unsigned short Holder)
 
 void AsyncTasks()
 {
-  CheckSerialData();
+  SerialH.CheckSerialData();
+
   Events.Evaluate(ESPClock.GetCurrentTime(), Place);
 
   delay(2);

@@ -1,8 +1,6 @@
 #include <SerialUtils.h>
 
-EventScheduler Events;
-
-void AddScheduleIfValid(String data, unsigned short extra)
+void SerialHandler::AddScheduleIfValid(String data, unsigned short extra)
 {
     int colonIndex = data.indexOf(':');
     if (colonIndex != -1)
@@ -19,7 +17,7 @@ void AddScheduleIfValid(String data, unsigned short extra)
         if (isHourValid && isMinuteValid)
         {
             EventTime newEvent(hourInt, minuteInt);
-            Events.Schedule(newEvent, extra);
+            Events->Schedule(newEvent, extra);
             return;
         }
     }
@@ -27,7 +25,8 @@ void AddScheduleIfValid(String data, unsigned short extra)
     Serial.println("Time is not valid");
 }
 
-void HandleCommand(List<String> data)
+
+void SerialHandler::HandleCommand(List<String> data)
 {
     if (data.size() >= 3)
     {
@@ -43,7 +42,7 @@ void HandleCommand(List<String> data)
 
         if (data[0] == "PRINT" && data[1] == "SCHEDULE" && data[2] == "ALL")
         {
-            Events.PrintScheduleList();
+            Events->PrintScheduleList();
         }
     }
 
@@ -52,13 +51,13 @@ void HandleCommand(List<String> data)
         if (data[0] == "TEST" && data[1] == "PACKER")
         {
             Serial.println("Testing...");
-            Events.TestPacker();
+            Events->TestPacker();
         }
 
         if (data[0] == "CLEAR" && data[1] == "FLASH")
         {
             Serial.println("Cleaning all data in flash.");
-            Events.ResetFlash();
+            Events->ResetFlash();
         }
 
         if (data[0] == "ESP" && data[1] == "RESTART")
@@ -87,7 +86,8 @@ void HandleCommand(List<String> data)
     }
 }
 
-void PushFragment(List<String> &data, String &dataFragment)
+
+void SerialHandler::PushFragment()
 {
     dataFragment.trim();
 
@@ -98,14 +98,14 @@ void PushFragment(List<String> &data, String &dataFragment)
     }
 }
 
-bool ProcessFragment(List<String> &data, String &dataFragment, TimerActions &timeOut, bool &spaceIgnoreMode)
+bool SerialHandler::ProcessFragment(List<String> &data, String &dataFragment)
 {
     char c = Serial.read();
     timeOut.ResetTimer();
 
     if (c == '\n')
     {
-        PushFragment(data, dataFragment);
+        PushFragment();
         return true;
     }
 
@@ -130,7 +130,7 @@ bool ProcessFragment(List<String> &data, String &dataFragment, TimerActions &tim
 
     if (c == ' ' && !dataFragment.isEmpty() && !spaceIgnoreMode)
     {
-        PushFragment(data, dataFragment);
+        PushFragment();
     }
     else if (c != ' ' || spaceIgnoreMode)
     {
@@ -140,14 +140,13 @@ bool ProcessFragment(List<String> &data, String &dataFragment, TimerActions &tim
     return false;
 }
 
-List<String> ReadSerialData(unsigned int timeOutValue)
+List<String> SerialHandler::ReadSerialData(unsigned int timeOutValue)
 {
-    List<String> data;
-    String dataFragment = "";
-    TimerActions timeOut;
-    bool spaceIgnoreMode;
+    data = List<String>();
+    dataFragment = "";
+    spaceIgnoreMode = false;
 
-    while (!(timeOut.IsTimerUp(timeOutValue) || (Serial.available() && ProcessFragment(data, dataFragment, timeOut, spaceIgnoreMode))))
+    while (!(timeOut.IsTimerUp(timeOutValue) || (Serial.available() && ProcessFragment(data, dataFragment))))
     {
         delay(1);
     }
@@ -156,10 +155,20 @@ List<String> ReadSerialData(unsigned int timeOutValue)
 }
 
 // Testes
-void CheckSerialData()
+void SerialHandler::CheckSerialData(Action<void(List<String>)> Action)
 {
     if (Serial.available())
     {
+        Serial.print("testse");
+        Action(ReadSerialData());
+    }
+}
+
+void SerialHandler::CheckSerialData()
+{
+    if (Serial.available())
+    {
+        Serial.print("testse");
         HandleCommand(ReadSerialData());
     }
 }
