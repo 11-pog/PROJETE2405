@@ -213,7 +213,7 @@ void EventScheduler::GetNextScheduledEvent(EventTime now)
 
 void EventScheduler::Evaluate(DateTime now, Action<void(unsigned short)> action)
 {
-    if (ScheduleList.size() > 0)
+    if (!ScheduleList.empty())
     {
         bool isDue = IsEventDue(now);
 

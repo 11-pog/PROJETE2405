@@ -1,6 +1,6 @@
 #include <SerialUtils.h>
 
-void SerialHandler::AddScheduleIfValid(String data, unsigned short extra)
+EventTime SerialHandler::ValidadeHourCode(String data)
 {
     int colonIndex = data.indexOf(':');
     if (colonIndex != -1)
@@ -17,37 +17,85 @@ void SerialHandler::AddScheduleIfValid(String data, unsigned short extra)
         if (isHourValid && isMinuteValid)
         {
             EventTime newEvent(hourInt, minuteInt);
-            Events->Schedule(newEvent, extra);
-            return;
+            return newEvent;
         }
+    }
+
+    return EventTime(255);
+}
+
+void SerialHandler::AddScheduleIfValid(String data, unsigned short extra)
+{
+    EventTime validatedTime = ValidadeHourCode(data);
+
+    if (validatedTime.Hours != 255) // 255, AKA byte equivalent of -1, literally the best representation of "this code isnt valid" i could find
+    {
+        Events->Schedule(validatedTime, extra);
+        return;
     }
 
     Serial.println("Time is not valid");
 }
 
+void SerialHandler::ReScheduleIfValid(String data, unsigned int ID)
+{
+    EventTime validatedTime = ValidadeHourCode(data);
+
+    if (validatedTime.Hours != 255 && ID != 0) // 255, AKA byte equivalent of -1, literally the best representation of "this code isnt valid" i could find
+    {
+        Serial.print("Rescheduling: ");
+        Serial.println(ID);
+        Serial.print(" to ");
+        Serial.println(data);
+
+        Events->ReSchedule(ID, validatedTime);
+        return;
+    }
+
+    Serial.println("Time or ID not valid");
+}
+
+void SerialHandler::UnScheduleIfValid(unsigned int ID)
+{
+    if (ID == 0)
+    {
+        Serial.println("Please provide a valid ID");
+        return;
+    }
+
+    Serial.print("Unscheduling: ");
+    Serial.println(ID);
+
+    Events->UnSchedule(ID);
+}
 
 void SerialHandler::HandleCommand(List<String> data)
 {
     if (data.size() >= 3)
     {
-        if (data[0] == "ADD" && data[1] == "SCHEDULE")
-        {
-            Serial.print("Adding to schedule: ");
-            Serial.println(data[2]);
-
-            unsigned short extra = data.size() == 4 ? data[3].toInt() : 0;
-
-            AddScheduleIfValid(data[2], extra);
-        }
-
         if (data[0] == "PRINT" && data[1] == "SCHEDULE" && data[2] == "ALL")
         {
             Events->PrintScheduleList();
         }
+
+        if (data[0] == "RESCHEDULE")
+        {
+            ReScheduleIfValid(data[2], data[1].toInt());
+        }
     }
 
-    if (data.size() == 2)
+    if (data.size() >= 2)
     {
+        if (data[0] == "SCHEDULE")
+        {
+            Serial.print("Adding to schedule: ");
+            Serial.println(data[1]);
+
+            unsigned short extra = data.size() == 3 ? data[2].toInt() : 0;
+
+            AddScheduleIfValid(data[1], extra);
+        }
+
         if (data[0] == "TEST" && data[1] == "PACKER")
         {
             Serial.println("Testing...");
@@ -68,6 +116,11 @@ void SerialHandler::HandleCommand(List<String> data)
             delay(500);
             ESP.restart();
         }
+
+        if (data[0] == "UNSCHEDULE")
+        {
+            UnScheduleIfValid(data[1].toInt());
+        }
     }
 
     if (data.size() == 1)
@@ -85,7 +138,6 @@ void SerialHandler::HandleCommand(List<String> data)
         }
     }
 }
-
 
 void SerialHandler::PushFragment()
 {

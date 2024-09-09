@@ -18,7 +18,10 @@ public:
     void CheckSerialData();
 
 private:
+    EventTime ValidadeHourCode(String data);
     void AddScheduleIfValid(String data, unsigned short extra);
+    void ReScheduleIfValid(String data, unsigned int ID);
+    void UnScheduleIfValid(unsigned int ID);
     void HandleCommand(List<String> data);
     void PushFragment();
     bool ProcessFragment(List<String> &data, String &dataFragment);
