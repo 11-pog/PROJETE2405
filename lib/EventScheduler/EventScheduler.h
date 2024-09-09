@@ -23,17 +23,17 @@ struct EventTime
 
     bool operator!=(const EventTime &other) const
     {
-        return Hours != other.Hours && Minutes != other.Minutes;
+        return Hours != other.Hours || Minutes != other.Minutes;
     }
 
     bool operator<=(const EventTime &other) const
     {
-        return Hours <= other.Hours && Minutes <= other.Minutes;
+        return Hours < other.Hours || Hours == other.Hours && Minutes <= other.Minutes;
     }
 
     bool operator>=(const EventTime &other) const
     {
-        return Hours >= other.Hours && Minutes >= other.Minutes;
+        return Hours > other.Hours || Hours == other.Hours && Minutes >= other.Minutes;
     }
 
     bool operator<(const EventTime &other) const
@@ -60,7 +60,12 @@ private: // Structs
 
         EventData(EventTime event = EventTime(), unsigned short extra = 0) : Event(event), Extra(extra)
         {
-            this->ID = (event.Hours << 23) | (event.Minutes << 17) | extra;
+            RedefineID();
+        }
+
+        void RedefineID()
+        {
+            this->ID = (Event.Hours << 23) | (Event.Minutes << 17) | Extra;
         }
 
         bool operator==(const EventData &other) const
@@ -70,7 +75,7 @@ private: // Structs
 
         bool operator!=(const EventData &other) const
         {
-            return !(Event == other.Event && Extra == other.Extra);
+            return Event != other.Event || Extra != other.Extra;
         }
 
         bool operator<=(const EventData &other) const
@@ -80,7 +85,7 @@ private: // Structs
 
         bool operator>(const EventData &other) const
         {
-            return !(Event <= other.Event);
+            return Event > other.Event;
         }
 
         bool operator>=(const EventData &other) const
@@ -90,7 +95,7 @@ private: // Structs
 
         bool operator<(const EventData &other) const
         {
-            return !(Event >= other.Event);
+            return Event < other.Event;
         }
 
         MSGPACK_DEFINE(Event, Extra, ID);
@@ -105,24 +110,23 @@ public:
     void TestPacker();
     void ResetFlash();
     void PrintScheduleList();
-
-    // Yet-To-Define Functions
-    void UnSchedule();
-    void ReSchedule();
+    void UnSchedule(unsigned int ID);
+    unsigned int ReSchedule(unsigned int ID, EventTime newTime);
 
     using EventList = List<EventData>;
 
 private:
-    std::pair<bool, unsigned short> IsEventDue(DateTime now);
+    bool IsEventDue(DateTime now);
     void SaveToFlash();
     void GetNextScheduledEvent(EventTime now);
     EventList GetDataFromFlash();
-    bool CheckForExistingID(EventData item);
+    short CheckForExistingID(unsigned int itemId);
+    void SortEvents();
 
-    bool Done;
     Preferences Flash;
     EventList ScheduleList;
-    EventData NextEvent;
+    EventData CurrentEvent;
+    unsigned int LastExecutedEventID;
 };
 
 using EventList = typename EventScheduler::EventList;
