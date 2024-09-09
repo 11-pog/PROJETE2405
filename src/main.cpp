@@ -62,4 +62,12 @@ void loop()
 {
   SerialChecker.ExecuteWhileWaiting(1000);
   ESPClock.PrintDateTime();
+
+  Serial.print("Distancia: ");
+  Serial.println(USSensor.GetDistance());
+
+  Serial.print("Temperatura: ");
+  Serial.println(DHTSensor.GetTemperature());
+  
+  Serial.print('\n');
 }
