@@ -159,7 +159,6 @@ void SerialHandler::CheckSerialData(Action<void(List<String>)> Action)
 {
     if (Serial.available())
     {
-        Serial.print("testse");
         Action(ReadSerialData());
     }
 }
@@ -168,7 +167,6 @@ void SerialHandler::CheckSerialData()
 {
     if (Serial.available())
     {
-        Serial.print("testse");
         HandleCommand(ReadSerialData());
     }
 }

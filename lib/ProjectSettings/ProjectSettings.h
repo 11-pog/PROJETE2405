@@ -11,7 +11,7 @@
 #include <SerialUtils.h>
 
 // Definições de constantes
-#define DHT_PIN 12
+#define DHT_PIN 27
 #define DHT_TYPE DHT22
 
 const char *wifiId = "internet"; // Nome da internet

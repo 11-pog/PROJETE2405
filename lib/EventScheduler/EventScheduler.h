@@ -54,12 +54,14 @@ class EventScheduler
 private: // Structs
     struct EventData
     {
-        EventTime Event;
-        unsigned short Extra;
-        bool Executed;
-        byte ID;
+        EventTime Event;      // hours = 5 bits -> 0 - 23 AND minutes = 6 bits -> 0 - 59
+        unsigned short Extra; // Full 16 bits used maybe
+        unsigned int ID;
 
-        EventData(EventTime event = EventTime(), unsigned short extra = 0) : Event(event), Extra(extra) {}
+        EventData(EventTime event = EventTime(), unsigned short extra = 0) : Event(event), Extra(extra)
+        {
+            this->ID = (event.Hours << 23) | (event.Minutes << 17) | extra;
+        }
 
         bool operator==(const EventData &other) const
         {
@@ -91,7 +93,7 @@ private: // Structs
             return !(Event >= other.Event);
         }
 
-        MSGPACK_DEFINE(Event, Extra);
+        MSGPACK_DEFINE(Event, Extra, ID);
     };
 
 public:
@@ -115,6 +117,7 @@ private:
     void SaveToFlash();
     void GetNextScheduledEvent(EventTime now);
     EventList GetDataFromFlash();
+    bool CheckForExistingID(EventData item);
 
     bool Done;
     Preferences Flash;

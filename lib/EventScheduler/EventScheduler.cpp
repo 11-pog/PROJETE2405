@@ -88,6 +88,19 @@ EventList EventScheduler::GetDataFromFlash()
     return EventList();
 }
 
+bool EventScheduler::CheckForExistingID(EventData item)
+{
+    for (auto event : ScheduleList)
+    {
+        if (event.ID == item.ID)
+        {
+            return true;
+        }
+    }
+
+    return false;
+}
+
 void EventScheduler::PrintScheduleList()
 {
     Serial.println("Printing Current Itens:");
@@ -103,6 +116,9 @@ void EventScheduler::PrintScheduleList()
         Serial.print("Extra: ");
         Serial.println(Data.Extra);
 
+        Serial.print("Unique ID: ");
+        Serial.println(Data.ID);
+
         Serial.println("\n\n");
     }
 }
@@ -116,11 +132,19 @@ void EventScheduler::ResetFlash()
 void EventScheduler::Schedule(EventTime ToSchedule, unsigned short extra)
 {
     EventData eventData(ToSchedule, extra);
-    ScheduleList.push_back(eventData);
 
-    SaveToFlash();
+    if (!CheckForExistingID(eventData))
+    {
+        ScheduleList.push_back(eventData);
 
-    Done = true;
+        SaveToFlash();
+
+        Done = true;
+    }
+    else
+    {
+        Serial.println("Event Already Scheduled");
+    }
 }
 
 std::pair<bool, unsigned short> EventScheduler::IsEventDue(DateTime now_tm)
