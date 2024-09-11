@@ -5,7 +5,7 @@
 
 void setup()
 {
-  Serial.begin(115200);
+  Serial.begin(9600);
   Events.begin();
 
   pinMode(MOTOR_PIN, OUTPUT);
@@ -63,11 +63,13 @@ void loop()
   SerialChecker.ExecuteWhileWaiting(1000);
   ESPClock.PrintDateTime();
 
+  Serial.print('\n');
+
   Serial.print("Distancia: ");
   Serial.println(USSensor.GetDistance());
 
-  Serial.print("Temperatura: ");
-  Serial.println(DHTSensor.GetTemperature());
+  Serial.print("Humildade: ");
+  Serial.println(DHTSensor.GetHumidity());
   
-  Serial.print('\n');
+  Serial.println('\n');
 }
