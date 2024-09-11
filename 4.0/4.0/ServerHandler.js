@@ -3,7 +3,7 @@ var http = require("http"),
   path = require("path");
 
 const thisDir = __dirname;
-index = fs.readFileSync(path.dirname(thisDir) + "/index.html");
+index = fs.readFileSync(path.dirname(thisDir) + "/4.0/index.html");
 
 const port = 45565;
 
