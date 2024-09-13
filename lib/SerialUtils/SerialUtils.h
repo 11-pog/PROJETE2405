@@ -4,6 +4,8 @@
 #include <TimerActions.h>
 #include <CppTypeDefs.h>
 
+#include <json
+
 #include <EventScheduler.h>
 
 #define DEF_SERIAL_TIMEOUT 1250U

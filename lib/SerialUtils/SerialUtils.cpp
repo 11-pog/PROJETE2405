@@ -99,6 +99,11 @@ void SerialHandler::HandleCommand(List<String> data)
             AddScheduleIfValid(data[1], extra);
         }
 
+        if (data[0] == "GET" && data[1] == "SCHEDULE")
+        {
+            
+        }
+
         if (data[0] == "TEST" && data[1] == "PACKER")
         {
             Serial.println("Testing...");
