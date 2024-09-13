@@ -163,14 +163,9 @@ bool SerialHandler::ProcessFragment(List<String> &data, String &dataFragment)
     char c = Serial.read();
     timeOut.ResetTimer();
 
-    if (c == '\n')
+    if (c == '\n' || c == ';')
     {
         PushFragment();
-        return true;
-    }
-
-    if (dataFragment == "__EOT__")
-    {
         return true;
     }
 
