@@ -1,0 +1,11 @@
+ON
+OFF
+RESET
+
+SCHD GET
+SCHD CLEAR
+
+SCHD DEL <id>
+
+SCHD ADD <hh:mm> <id>
+SCHD SWAP <id> <hh:mm>

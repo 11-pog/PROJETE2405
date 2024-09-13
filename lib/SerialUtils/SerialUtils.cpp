@@ -62,89 +62,15 @@ void SerialHandler::UnScheduleIfValid(unsigned int ID)
 {
     if (ID == 0)
     {
-        Serial.println("Please provide a valid ID");
+        Serial.print("# Please provide a valid ID\n");
         return;
     }
 
-    Serial.print("Unscheduling: ");
-    Serial.println(ID);
+    Serial.print("# Unscheduling: ");
+    Serial.print(ID);
+    Serial.print('\n');
 
     Events->UnSchedule(ID);
-}
-
-// For human use, debugging, terminal commands n shit
-void SerialHandler::SerialCommandsUser(List<String> data)
-{
-    if (data.size() >= 3)
-    {
-        if (data[0] == "PRINT" && data[1] == "SCHEDULE" && data[2] == "ALL")
-        {
-            Events->PrintScheduleList();
-        }
-
-        if (data[0] == "RESCHEDULE")
-        {
-            ReScheduleIfValid(data[2], data[1].toInt());
-        }
-    }
-
-    if (data.size() >= 2)
-    {
-        if (data[0] == "SCHEDULE")
-        {
-            Serial.print("Adding to schedule: ");
-            Serial.println(data[1]);
-
-            unsigned short extra = data.size() == 3 ? data[2].toInt() : 0;
-
-            AddScheduleIfValid(data[1], extra);
-        }
-
-        if (data[0] == "GET" && data[1] == "SCHEDULE")
-        {
-        }
-
-        if (data[0] == "TEST" && data[1] == "PACKER")
-        {
-            Serial.println("Testing...");
-            Events->TestPacker();
-        }
-
-        if (data[0] == "CLEAR" && data[1] == "FLASH")
-        {
-            Serial.println("Cleaning all data in flash.");
-            Events->ResetFlash();
-        }
-
-        if (data[0] == "ESP" && data[1] == "RESTART")
-        {
-            Serial.println("Esp should restart ");
-            delay(1000);
-            Serial.println("NOW");
-            delay(500);
-            ESP.restart();
-        }
-
-        if (data[0] == "UNSCHEDULE")
-        {
-            UnScheduleIfValid(data[1].toInt());
-        }
-    }
-
-    if (data.size() == 1)
-    {
-        if (data[0] == "ON")
-        {
-            Serial.println("Motor is now ON");
-            digitalWrite(MOTOR_PIN, 1);
-        }
-
-        else if (data[0] == "OFF")
-        {
-            Serial.println("Motor is now OFF");
-            digitalWrite(MOTOR_PIN, 0);
-        }
-    }
 }
 
 // For processing commands recieved directly from the site's javascript
@@ -164,19 +90,36 @@ void SerialHandler::CMDFromWebJS(List<String> data)
             Serial.println("MOTOR OFF ACK;");
             digitalWrite(MOTOR_PIN, 0);
         }
-        break;
 
-    case 2:
-        if (data[0] == "SCHD" && data[1] == "GET")
+        else if (data[0] == "RESET")
         {
-            // code
+            Serial.println("Esp should restart ");
+            delay(1000);
+            Serial.println("NOW");
+            delay(500);
+            ESP.restart();
+        }
+        break;
+    case 2:
+        if (data[0] == "SCHD")
+        {
+            if (data[1] == "GET")
+            {
+                Events->PrintScheduleList();
+            }
+
+            if (data[1] == "CLEAR")
+            {
+                Serial.println("Cleaning all data in flash.");
+                Events->ResetFlash();
+            }
         }
         break;
 
     case 3:
         if (data[0] == "SCHD" && data[1] == "DEL")
         {
-            // code
+            UnScheduleIfValid(data[2].toInt());
         }
 
     case 4:
@@ -184,10 +127,15 @@ void SerialHandler::CMDFromWebJS(List<String> data)
         {
             if (data[1] == "ADD")
             {
+                Serial.print("Adding to schedule: ");
+                Serial.println(data[1]);
+
+                AddScheduleIfValid(data[2], data[3].toInt());
             }
 
-            else if(data[1] == "SWAP")
+            else if (data[1] == "SWAP")
             {
+                ReScheduleIfValid(data[3], data[2].toInt());
             }
         }
     default:
@@ -270,6 +218,6 @@ void SerialHandler::CheckSerialData()
 {
     if (Serial.available())
     {
-        SerialCommandsUser(ReadSerialData());
+        CMDFromWebJS(ReadSerialData());
     }
 }
