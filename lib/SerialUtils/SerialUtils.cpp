@@ -72,7 +72,8 @@ void SerialHandler::UnScheduleIfValid(unsigned int ID)
     Events->UnSchedule(ID);
 }
 
-void SerialHandler::HandleCommand(List<String> data)
+// For human use, debugging, terminal commands n shit
+void SerialHandler::SerialCommandsUser(List<String> data)
 {
     if (data.size() >= 3)
     {
@@ -101,7 +102,6 @@ void SerialHandler::HandleCommand(List<String> data)
 
         if (data[0] == "GET" && data[1] == "SCHEDULE")
         {
-            
         }
 
         if (data[0] == "TEST" && data[1] == "PACKER")
@@ -144,6 +144,54 @@ void SerialHandler::HandleCommand(List<String> data)
             Serial.println("Motor is now OFF");
             digitalWrite(MOTOR_PIN, 0);
         }
+    }
+}
+
+// For processing commands recieved directly from the site's javascript
+void SerialHandler::CMDFromWebJS(List<String> data)
+{
+    switch (data.size())
+    {
+    case 1:
+        if (data[0] == "ON")
+        {
+            Serial.print("MOTOR ON ACK;");
+            digitalWrite(MOTOR_PIN, 1);
+        }
+
+        else if (data[0] == "OFF")
+        {
+            Serial.println("MOTOR OFF ACK;");
+            digitalWrite(MOTOR_PIN, 0);
+        }
+        break;
+
+    case 2:
+        if (data[0] == "SCHD" && data[1] == "GET")
+        {
+            // code
+        }
+        break;
+
+    case 3:
+        if (data[0] == "SCHD" && data[1] == "DEL")
+        {
+            // code
+        }
+
+    case 4:
+        if (data[0] == "SCHD")
+        {
+            if (data[1] == "ADD")
+            {
+            }
+
+            else if(data[1] == "SWAP")
+            {
+            }
+        }
+    default:
+        return;
     }
 }
 
@@ -222,6 +270,6 @@ void SerialHandler::CheckSerialData()
 {
     if (Serial.available())
     {
-        HandleCommand(ReadSerialData());
+        SerialCommandsUser(ReadSerialData());
     }
 }

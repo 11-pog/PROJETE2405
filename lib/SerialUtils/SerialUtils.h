@@ -4,7 +4,7 @@
 #include <TimerActions.h>
 #include <CppTypeDefs.h>
 
-#include <json
+#include <ArduinoJson.h>
 
 #include <EventScheduler.h>
 
@@ -24,7 +24,8 @@ private:
     void AddScheduleIfValid(String data, unsigned short extra);
     void ReScheduleIfValid(String data, unsigned int ID);
     void UnScheduleIfValid(unsigned int ID);
-    void HandleCommand(List<String> data);
+    void SerialCommandsUser(List<String> data);
+    void CMDFromWebJS(List<String> data);
     void PushFragment();
     bool ProcessFragment(List<String> &data, String &dataFragment);
 
