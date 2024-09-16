@@ -9,10 +9,14 @@
 #include <Common.h>
 #include <TimerActions.h>
 #include <SerialUtils.h>
+#include <PubSubClient.h>
 
 // Definições de constantes
 #define DHT_PIN 27
 #define DHT_TYPE DHT22
+
+#define MQTTURL "broker.emqx.io"
+#define MQTTPORT 1883
 
 const char *wifiId = "internet"; // Nome da internet
 const char *wifiPassword = "internet";  // Senha da internet
@@ -24,6 +28,9 @@ const long timezone = -3;
 const byte daysavetime = 0;
 
 // Object instantiation
+
+WiFiClient esp_Client;
+PubSubClient mqtt_Client(esp_Client);
 
 Time::Clock ESPClock(timezone);
 Sensor::DHT_Sensor DHTSensor(DHT_PIN, DHT_TYPE);

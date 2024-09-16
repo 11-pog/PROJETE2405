@@ -4,8 +4,6 @@
 #include <TimerActions.h>
 #include <CppTypeDefs.h>
 
-#include <ArduinoJson.h>
-
 #include <EventScheduler.h>
 
 #define DEF_SERIAL_TIMEOUT 1250U
@@ -18,7 +16,6 @@ public:
     List<String> ReadSerialData(unsigned int timeOut = DEF_SERIAL_TIMEOUT);
     void CheckSerialData(Action<void(List<String>)> Action);
     void CheckSerialData();
-
 private:
     EventTime ValidadeHourCode(String data);
     void AddScheduleIfValid(String data, unsigned short extra);
