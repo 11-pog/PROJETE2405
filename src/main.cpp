@@ -2,15 +2,17 @@
 
 /**/
 
-void MQTT_Act(byte *Data)
+void MQTT_Act(byte *Data, unsigned int size)
 {
-  String DataSTR = String((char *)Data);
+  String DataSTR = String((char *)Data, size);
   if (DataSTR == "ON")
   {
+    Serial.println("MotorON");
     digitalWrite(MOTOR_PIN, 1);
   }
-  else if(DataSTR == "OFF")
+  else if (DataSTR == "OFF")
   {
+    Serial.println("MotorOFF");
     digitalWrite(MOTOR_PIN, 0);
   }
 }
@@ -22,22 +24,19 @@ void MQTT_Callback(char *Topic, byte *payload, unsigned int loadSize)
     Serial.print("Recieved: ");
     Serial.print(Topic);
     Serial.print(" => ");
-    String load = String((char *)payload);
+    String load = String((char *)payload, loadSize);
     Serial.println(load);
   }
   else
   {
-    MQTT_Act(payload);
+    MQTT_Act(payload, loadSize);
   }
 }
 
-const IPAddress staticIP(192, 168, 1, 2);
-const IPAddress gateway(192, 168, 1, 1);
-const IPAddress subnet(255, 255, 255, 0);
-const IPAddress dnsServer(8, 8, 8, 8); 
-
 void setup()
 {
+  randomSeed(analogRead(34));
+
   Serial.begin(9600);
   Events.begin();
 
@@ -59,28 +58,34 @@ void setup()
     }
   }
 
+  WiFi.onEvent(WifiStuff);
+
   Serial.println("");
   Serial.println("Conectado!");
 
   mqtt_Client.setServer(MQTTURL, MQTTPORT);
-  mqtt_Client.connect("ESP_BOARD");
 
-  Serial.print("Connecting MQTT");
+  int rdn = random(1, 99999);
+  String thing = "ESP_BOARD" + String(rdn);
+  Serial.println(thing);
+  delay(1000);
 
   while (!mqtt_Client.connected())
   {
-    Serial.print('.');
-    delay(1000);
+    Serial.println("Connecting MQTT...");
+    if(!mqtt_Client.connect(thing.c_str()))
+    {
+      Serial.println("Failed...");
+      delay(4000);
+    }
   }
 
-  Serial.println("");
   Serial.println("MQTT Connected");
 
   mqtt_Client.subscribe("Testes");
   mqtt_Client.subscribe("ESP_COMMAND");
 
   mqtt_Client.publish("RXTeste", "CONNECTADO");
-
   mqtt_Client.setCallback(MQTT_Callback);
 
   ESPClock.SyncTime();
@@ -107,6 +112,8 @@ void AsyncTasks()
   SerialH.CheckSerialData();
 
   Events.Evaluate(ESPClock.GetCurrentTime(), Place);
+
+  mqtt_Client.loop();
 
   delay(2);
 }

@@ -7,6 +7,8 @@
 #include <DHT.h>
 #include <TimerActions.h>
 
+#include <WiFi.h>
+
 // Bibliotecas do C++
 #include <vector>
 
@@ -53,5 +55,7 @@ namespace Sensor
         byte echoPin;
     };
 }
+
+void WifiStuff(WiFiEvent_t event);
 
 #endif

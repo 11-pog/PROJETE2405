@@ -104,3 +104,82 @@ namespace Sensor
   */
   // Piadas
 }
+
+void WifiStuff(WiFiEvent_t event)
+{
+  log_i("[WiFi-event] event: %d\n", event);
+  switch (event)
+  {
+  case SYSTEM_EVENT_WIFI_READY:
+    log_i("WiFi interface ready");
+    break;
+  case SYSTEM_EVENT_SCAN_DONE:
+    log_i("Completed scan for access points");
+    break;
+  case SYSTEM_EVENT_STA_START:
+    log_i("WiFi client started");
+    break;
+  case SYSTEM_EVENT_STA_STOP:
+    log_i("WiFi clients stopped");
+    break;
+  case SYSTEM_EVENT_STA_CONNECTED:
+    log_i("Connected to access point");
+    break;
+  case SYSTEM_EVENT_STA_DISCONNECTED:
+    log_i("Disconnected from WiFi access point");
+    break;
+  case SYSTEM_EVENT_STA_AUTHMODE_CHANGE:
+    log_i("Authentication mode of access point has changed");
+    break;
+  case SYSTEM_EVENT_STA_GOT_IP:
+    log_i("Obtained IP address: %s", WiFi.localIP());
+    break;
+  case SYSTEM_EVENT_STA_LOST_IP:
+    log_i("Lost IP address and IP address is reset to 0");
+    //      vTaskDelay( 5000 );
+    //      ESP.restart();
+    break;
+  case SYSTEM_EVENT_STA_WPS_ER_SUCCESS:
+    log_i("WiFi Protected Setup (WPS): succeeded in enrollee mode");
+    break;
+  case SYSTEM_EVENT_STA_WPS_ER_FAILED:
+    log_i("WiFi Protected Setup (WPS): failed in enrollee mode");
+    //      ESP.restart();
+    break;
+  case SYSTEM_EVENT_STA_WPS_ER_TIMEOUT:
+    log_i("WiFi Protected Setup (WPS): timeout in enrollee mode");
+    break;
+  case SYSTEM_EVENT_STA_WPS_ER_PIN:
+    log_i("WiFi Protected Setup (WPS): pin code in enrollee mode");
+    break;
+  case SYSTEM_EVENT_AP_START:
+    log_i("WiFi access point started");
+    break;
+  case SYSTEM_EVENT_AP_STOP:
+    log_i("WiFi access point  stopped");
+    //      WiFi.mode( WIFI_OFF);
+    //      esp_sleep_enable_timer_wakeup( 1000000 * 2 ); // 1 second times how many seconds wanted
+    //      esp_deep_sleep_start();
+    break;
+  case SYSTEM_EVENT_AP_STACONNECTED:
+    log_i("Client connected");
+    break;
+  case SYSTEM_EVENT_AP_STADISCONNECTED:
+    log_i("WiFi client disconnected");
+    break;
+  case SYSTEM_EVENT_AP_STAIPASSIGNED:
+    log_i("Assigned IP address to client");
+    break;
+  case SYSTEM_EVENT_AP_PROBEREQRECVED:
+    log_i("Received probe request");
+    break;
+  case SYSTEM_EVENT_GOT_IP6:
+    log_i("IPv6 is preferred");
+    break;
+  case SYSTEM_EVENT_ETH_GOT_IP:
+    log_i("Obtained IP address");
+    break;
+  default:
+    break;
+  }
+}

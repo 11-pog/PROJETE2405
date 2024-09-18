@@ -5,6 +5,8 @@
 #include <WiFi.h>
 #include <time.h>
 
+#include <random>
+
 // Bibliotecas privadas do projeto
 #include <Common.h>
 #include <TimerActions.h>
@@ -15,17 +17,23 @@
 #define DHT_PIN 27
 #define DHT_TYPE DHT22
 
-#define MQTTURL "broker.emqx.io"
 #define MQTTPORT 1883
 
-const char *wifiId = "internet"; // Nome da internet
-const char *wifiPassword = "internet";  // Senha da internet
+const IPAddress MQTTURL(35, 172, 255, 228);
+
+const char *wifiId = "alunos"; // Nome da internet
+const char *wifiPassword = "etefmc123";  // Senha da internet
 
 const byte trigPin = 5;  // Pino do Trigger
 const byte echoPin = 18; // Pino do Echo
 
 const long timezone = -3;
 const byte daysavetime = 0;
+
+const IPAddress staticIP(192, 168, 1, 2);
+const IPAddress gateway(192, 168, 1, 1);
+const IPAddress subnet(255, 255, 255, 0);
+const IPAddress dnsServer(8, 8, 8, 8);
 
 // Object instantiation
 
