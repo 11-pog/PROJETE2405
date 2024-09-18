@@ -17,7 +17,8 @@
 #define DHT_PIN 27
 #define DHT_TYPE DHT22
 
-#define MQTTPORT 1883
+#define MQTTUSER "2405PROJ"
+#define MQTTPASS "123Grupo2405Incrivel"
 
 const IPAddress MQTTURL(35, 172, 255, 228);
 
@@ -34,6 +35,8 @@ const IPAddress staticIP(192, 168, 1, 2);
 const IPAddress gateway(192, 168, 1, 1);
 const IPAddress subnet(255, 255, 255, 0);
 const IPAddress dnsServer(8, 8, 8, 8);
+
+const char* ClientID = "_PROJETE2405ETEFMC_ESPBOARD:2405";
 
 // Object instantiation
 

@@ -2,6 +2,7 @@
 
 /**/
 
+//Teste
 void MQTT_Act(byte *Data, unsigned int size)
 {
   String DataSTR = String((char *)Data, size);
@@ -19,7 +20,8 @@ void MQTT_Act(byte *Data, unsigned int size)
 
 void MQTT_Callback(char *Topic, byte *payload, unsigned int loadSize)
 {
-  if (Topic != "ESP_COMMAND")
+  string topic(Topic);
+  if (topic != "ESP_COMMAND")
   {
     Serial.print("Recieved: ");
     Serial.print(Topic);
@@ -33,11 +35,32 @@ void MQTT_Callback(char *Topic, byte *payload, unsigned int loadSize)
   }
 }
 
+// "Inspirado" no do Nicholas
+void ConnectMQTT()
+{
+  while (!mqtt_Client.connected())
+  {
+    if (!WiFi.isConnected())
+    {
+      Serial.println("Wifi Not Connected!");
+    }
+
+    Serial.println("Connecting MQTT...");
+    mqtt_Client.connect(ClientID);
+
+    mqtt_Client.subscribe("Testes");
+    mqtt_Client.subscribe("ESP_COMMAND");
+
+    mqtt_Client.publish("RXTeste", "CONNECTADO");
+  }
+}
+
 void setup()
 {
   randomSeed(analogRead(34));
 
   Serial.begin(9600);
+
   Events.begin();
 
   pinMode(MOTOR_PIN, OUTPUT);
@@ -51,11 +74,6 @@ void setup()
   {
     Serial.print('.');
     delay(1000);
-
-    if (WiFi.status() == WL_CONNECT_FAILED)
-    {
-      ESP.restart();
-    }
   }
 
   WiFi.onEvent(WifiStuff);
@@ -63,30 +81,14 @@ void setup()
   Serial.println("");
   Serial.println("Conectado!");
 
-  mqtt_Client.setServer(MQTTURL, MQTTPORT);
-
-  int rdn = random(1, 99999);
-  String thing = "ESP_BOARD" + String(rdn);
-  Serial.println(thing);
-  delay(1000);
-
-  while (!mqtt_Client.connected())
-  {
-    Serial.println("Connecting MQTT...");
-    if(!mqtt_Client.connect(thing.c_str()))
-    {
-      Serial.println("Failed...");
-      delay(4000);
-    }
-  }
-
-  Serial.println("MQTT Connected");
-
-  mqtt_Client.subscribe("Testes");
-  mqtt_Client.subscribe("ESP_COMMAND");
-
-  mqtt_Client.publish("RXTeste", "CONNECTADO");
+  mqtt_Client.setServer(MQTTURL, 1883);
   mqtt_Client.setCallback(MQTT_Callback);
+
+  ConnectMQTT();
+
+  digitalWrite(MOTOR_PIN, 1);
+  delay(200);
+  digitalWrite(MOTOR_PIN, 0);
 
   ESPClock.SyncTime();
 }
@@ -122,6 +124,11 @@ TimerActions SerialChecker(AsyncTasks);
 
 void loop()
 {
+  if (!mqtt_Client.connected())
+  {
+    ConnectMQTT();
+  }
+
   SerialChecker.ExecuteWhileWaiting(1000);
   ESPClock.PrintDateTime();
 
