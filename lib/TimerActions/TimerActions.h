@@ -2,14 +2,16 @@
 #define TimerActions_H
 
 #include <Arduino.h>
+#include <CppTypeDefs.h>
 
 class TimerActions
 {
 public:
-    TimerActions(std::function<void()> executableTask = std::function<void()>());
+    TimerActions(Action<void()> executableTask = std::function<void()>());
     void ExecuteWhileWaiting(unsigned long timeInMillis);
-    void SwitchTask(std::function<void()> executableTask);
+    void SwitchTask(Action<void()> executableTask);
     bool IsTimerUp(unsigned long timeInMillis);
+    void RunEvery(unsigned long delay);
     void ResetTimer();
 
 private:

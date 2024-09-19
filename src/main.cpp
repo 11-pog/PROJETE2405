@@ -2,22 +2,6 @@
 
 /**/
 
-//Teste
-void MQTT_Act(byte *Data, unsigned int size)
-{
-  String DataSTR = String((char *)Data, size);
-  if (DataSTR == "ON")
-  {
-    Serial.println("MotorON");
-    digitalWrite(MOTOR_PIN, 1);
-  }
-  else if (DataSTR == "OFF")
-  {
-    Serial.println("MotorOFF");
-    digitalWrite(MOTOR_PIN, 0);
-  }
-}
-
 void MQTT_Callback(char *Topic, byte *payload, unsigned int loadSize)
 {
   string topic(Topic);
@@ -38,11 +22,14 @@ void MQTT_Callback(char *Topic, byte *payload, unsigned int loadSize)
 // "Inspirado" no do Nicholas
 void ConnectMQTT()
 {
+  byte i = 0;
   while (!mqtt_Client.connected())
   {
+
     if (!WiFi.isConnected())
     {
       Serial.println("Wifi Not Connected!");
+      ESP.restart();
     }
 
     Serial.println("Connecting MQTT...");
@@ -52,7 +39,15 @@ void ConnectMQTT()
     mqtt_Client.subscribe("ESP_COMMAND");
 
     mqtt_Client.publish("RXTeste", "CONNECTADO");
+
+    if (i > 2)
+    {
+      ESP.restart();
+    }
+
+    i++;
   }
+  Serial.println("Connected?");
 }
 
 void setup()
@@ -108,6 +103,14 @@ void Place(unsigned short Holder)
   Serial.println("Motor OFF");
   digitalWrite(MOTOR_PIN, 0);
 }
+
+void UpdateSiteData()
+{
+  mqtt_Client.publish("DHT_DATA:HUMI", String(DHTSensor.GetHumidity()).c_str());
+  mqtt_Client.publish("DHT_DATA:TEMP", String(USSensor.GetDistance()).c_str());
+}
+
+TimerActions PeriodicRunner();
 
 void AsyncTasks()
 {

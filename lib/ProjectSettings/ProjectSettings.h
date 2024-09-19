@@ -4,14 +4,13 @@
 // Bibliotecas do ESP32
 #include <WiFi.h>
 #include <time.h>
-
+#include <PubSubClient.h>
 #include <random>
 
 // Bibliotecas privadas do projeto
 #include <Common.h>
 #include <TimerActions.h>
 #include <SerialUtils.h>
-#include <PubSubClient.h>
 
 // Definições de constantes
 #define DHT_PIN 27

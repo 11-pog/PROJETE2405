@@ -5,9 +5,10 @@
 #include <CppTypeDefs.h>
 
 #include <EventScheduler.h>
+#include <MQTT_Utils.h>
 
 #define DEF_SERIAL_TIMEOUT 1250U
-#define MOTOR_PIN 22U
+
 
 class SerialHandler
 {

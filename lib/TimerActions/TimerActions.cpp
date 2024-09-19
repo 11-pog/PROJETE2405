@@ -28,6 +28,14 @@ bool TimerActions::IsTimerUp(unsigned long delay)
     return false;
 }
 
+void TimerActions::RunEvery(unsigned long delay)
+{
+    if (IsTimerUp(delay))
+    {
+        executableTask();
+    }
+}
+
 void TimerActions::ResetTimer()
 {
     lastTime = 0;

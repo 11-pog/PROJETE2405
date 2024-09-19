@@ -2,6 +2,8 @@
 #define CppTypeDefs_H
 
 #include <vector>
+#include <string>
+#include <functional>
 
 using byte = unsigned char;
 using sbyte = char;
