@@ -16,29 +16,28 @@
 #define DHT_PIN 27
 #define DHT_TYPE DHT22
 
-const char* MQTTURL = "broker.emqx.io";
+const char* MQTTURL;
 
-const char *wifiId = "internet"; // Nome da internet
-const char *wifiPassword = "internet";  // Senha da internet
+const char *wifiId; // Nome da internet
+const char *wifiPassword;  // Senha da internet
 
-const byte trigPin = 5;  // Pino do Trigger
-const byte echoPin = 18; // Pino do Echo
+const byte trigPin;  // Pino do Trigger
+const byte echoPin; // Pino do Echo
 
-const long timezone = -3;
-const byte daysavetime = 0;
+const long timezone;
+const byte daysavetime;
 
-const char* ClientID = "_PROJETE2405ETEFMC_ESPBOARD:2405";
+const char* ClientID;
 
-// Object instantiation
+// Object instantiation (done in the .cpp file)
 
-WiFiClient esp_Client;
-PubSubClient client(esp_Client);
+extern PubSubClient client;
 
-Time::Clock ESPClock(timezone);
-Sensor::DHT_Sensor DHTSensor(DHT_PIN, DHT_TYPE);
-Sensor::Ultrasonic_Sensor USSensor(trigPin, echoPin);
+extern Time::Clock ESPClock;
+extern Sensor::DHT_Sensor DHTSensor;
+extern Sensor::Ultrasonic_Sensor USSensor;
 
-EventScheduler Events;
-SerialHandler SerialH(&Events);
+extern EventScheduler Events;
+extern SerialHandler SerialH;
 
 #endif

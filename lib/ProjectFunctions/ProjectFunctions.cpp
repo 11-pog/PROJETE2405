@@ -3,26 +3,6 @@
 List<String> LastLevelUpdates;
 List<String> LastHumidityUpdates;
 
-void MQTT_Act(byte *Data, unsigned int size)
-{
-    String DataSTR = String((char *)Data, size);
-    if (DataSTR == "ON")
-    {
-        Serial.println("MotorON");
-        digitalWrite(MOTOR_PIN, 1);
-    }
-    else if (DataSTR == "OFF")
-    {
-        Serial.println("MotorOFF");
-        digitalWrite(MOTOR_PIN, 0);
-    }
-    else if (DataSTR == "GETGRAPHINFO")
-    {
-        SendLevelToHost();
-        SendHumiToHost();
-    }
-}
-
 String BuildAllData(List<String> data)
 {
     String final = "";
@@ -48,6 +28,25 @@ void SendHumiToHost()
     client.publish("ESP_DATA", query.c_str());
 }
 
+void MQTT_Act(byte *Data, unsigned int size)
+{
+    String DataSTR = String((char *)Data, size);
+    if (DataSTR == "ON")
+    {
+        Serial.println("MotorON");
+        digitalWrite(MOTOR_PIN, 1);
+    }
+    else if (DataSTR == "OFF")
+    {
+        Serial.println("MotorOFF");
+        digitalWrite(MOTOR_PIN, 0);
+    }
+    else if (DataSTR == "GETGRAPHINFO")
+    {
+        SendLevelToHost();
+        SendHumiToHost();
+    }
+}
 
 void MQTT_Callback(char *Topic, byte *payload, unsigned int loadSize)
 {
