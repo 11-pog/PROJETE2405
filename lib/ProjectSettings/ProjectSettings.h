@@ -18,19 +18,14 @@
 
 const char* MQTTURL = "broker.emqx.io";
 
-const char *wifiId = "Anizio CPereira"; // Nome da internet
-const char *wifiPassword = "25030917";  // Senha da internet
+const char *wifiId = "internet"; // Nome da internet
+const char *wifiPassword = "internet";  // Senha da internet
 
 const byte trigPin = 5;  // Pino do Trigger
 const byte echoPin = 18; // Pino do Echo
 
 const long timezone = -3;
 const byte daysavetime = 0;
-
-const IPAddress staticIP(192, 168, 1, 2);
-const IPAddress gateway(192, 168, 1, 1);
-const IPAddress subnet(255, 255, 255, 0);
-const IPAddress dnsServer(8, 8, 8, 8);
 
 const char* ClientID = "_PROJETE2405ETEFMC_ESPBOARD:2405";
 
