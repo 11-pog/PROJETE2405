@@ -16,13 +16,10 @@
 #define DHT_PIN 27
 #define DHT_TYPE DHT22
 
-#define MQTTUSER "2405PROJ"
-#define MQTTPASS "123Grupo2405Incrivel"
+const char* MQTTURL = "broker.emqx.io";
 
-const IPAddress MQTTURL(35, 172, 255, 228);
-
-const char *wifiId = "alunos"; // Nome da internet
-const char *wifiPassword = "etefmc123";  // Senha da internet
+const char *wifiId = "Anizio CPereira"; // Nome da internet
+const char *wifiPassword = "25030917";  // Senha da internet
 
 const byte trigPin = 5;  // Pino do Trigger
 const byte echoPin = 18; // Pino do Echo
@@ -40,7 +37,7 @@ const char* ClientID = "_PROJETE2405ETEFMC_ESPBOARD:2405";
 // Object instantiation
 
 WiFiClient esp_Client;
-PubSubClient mqtt_Client(esp_Client);
+PubSubClient client(esp_Client);
 
 Time::Clock ESPClock(timezone);
 Sensor::DHT_Sensor DHTSensor(DHT_PIN, DHT_TYPE);

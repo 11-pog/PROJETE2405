@@ -87,7 +87,9 @@ namespace Sensor
     return distanceCm;
   }
 
-  /*
+  
+}
+/*
   struct Projete
   {
     static const byte day = 7;
@@ -103,8 +105,8 @@ namespace Sensor
   }
   */
   // Piadas
-}
 
+  
 void WifiStuff(WiFiEvent_t event)
 {
   log_i("[WiFi-event] event: %d\n", event);

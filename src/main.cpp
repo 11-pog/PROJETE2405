@@ -23,7 +23,7 @@ void MQTT_Callback(char *Topic, byte *payload, unsigned int loadSize)
 void ConnectMQTT()
 {
   byte i = 0;
-  while (!mqtt_Client.connected())
+  while (!client.connected())
   {
 
     if (!WiFi.isConnected())
@@ -33,12 +33,12 @@ void ConnectMQTT()
     }
 
     Serial.println("Connecting MQTT...");
-    mqtt_Client.connect(ClientID);
+    client.connect(ClientID);
 
-    mqtt_Client.subscribe("Testes");
-    mqtt_Client.subscribe("ESP_COMMAND");
+    client.subscribe("Testes");
+    client.subscribe("ESP_COMMAND");
 
-    mqtt_Client.publish("RXTeste", "CONNECTADO");
+    client.publish("RXTeste", "CONNECTADO");
 
     if (i > 2)
     {
@@ -61,7 +61,6 @@ void setup()
   pinMode(MOTOR_PIN, OUTPUT);
 
   WiFi.begin(wifiId, wifiPassword);
-  WiFi.config(staticIP, gateway, subnet, dnsServer);
 
   Serial.print("Conectando");
 
@@ -75,9 +74,11 @@ void setup()
 
   Serial.println("");
   Serial.println("Conectado!");
+  Serial.println("IP: ");
+  Serial.println(WiFi.localIP());
 
-  mqtt_Client.setServer(MQTTURL, 1883);
-  mqtt_Client.setCallback(MQTT_Callback);
+  client.setServer(MQTTURL, 1883);
+  client.setCallback(MQTT_Callback);
 
   ConnectMQTT();
 
@@ -104,35 +105,49 @@ void Place(unsigned short Holder)
   digitalWrite(MOTOR_PIN, 0);
 }
 
-void UpdateSiteData()
+String buildQuery(float value)
 {
-  mqtt_Client.publish("DHT_DATA:HUMI", String(DHTSensor.GetHumidity()).c_str());
-  mqtt_Client.publish("DHT_DATA:TEMP", String(USSensor.GetDistance()).c_str());
+  DateTime now = ESPClock.GetCurrentTime();
+
+  float Value = std::min((float)100, value);
+
+  String year(now.tm_year + 1900);
+  String month(now.tm_mon + 1);
+  String day(now.tm_mday);
+
+  String date = year + ' ' + month + ' ' + day;
+
+  String hour(now.tm_hour);
+  String min(now.tm_min);
+  String sec(now.tm_sec);
+
+  String time = hour + ' ' + min + ' ' + sec;
+
+  String query = String(Value) + " / " + date + ' ' + time;
+  return query;
 }
 
-TimerActions PeriodicRunner();
+PeriodicExecutor UpdateSiteLevel([]()
+                                  { client.publish("DHT_DATA:LEVEL", buildQuery(USSensor.GetDistance()).c_str()); });
 
-void AsyncTasks()
-{
+PeriodicExecutor UpdateSiteHumidity([]()
+                                    { client.publish("DHT_DATA:HUMI", buildQuery(DHTSensor.GetHumidity()).c_str()); });
+
+SimultaneousExecutor SerialChecker([]()
+                                  {
   SerialH.CheckSerialData();
 
   Events.Evaluate(ESPClock.GetCurrentTime(), Place);
 
-  mqtt_Client.loop();
+  client.loop();
 
-  delay(2);
-}
+  UpdateSiteHumidity.RunEvery(5000);
+  UpdateSiteLevel.RunEvery(1000);
 
-TimerActions SerialChecker(AsyncTasks);
+  delay(1); });
 
-void loop()
+void TestPrint()
 {
-  if (!mqtt_Client.connected())
-  {
-    ConnectMQTT();
-  }
-
-  SerialChecker.ExecuteWhileWaiting(1000);
   ESPClock.PrintDateTime();
 
   Serial.print('\n');
@@ -144,4 +159,16 @@ void loop()
   Serial.println(DHTSensor.GetHumidity());
 
   Serial.println('\n');
+}
+
+void loop()
+{
+  if (!client.connected())
+  {
+    ConnectMQTT();
+  }
+
+  SerialChecker.ExecuteWhileWaiting(1000);
+
+  TestPrint();
 }

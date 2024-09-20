@@ -1,8 +1,6 @@
 #include <TimerActions.h>
 
-TimerActions::TimerActions(std::function<void()> executableTask) : executableTask(executableTask) {}
-
-void TimerActions::ExecuteWhileWaiting(unsigned long delay)
+void SimultaneousExecutor::ExecuteWhileWaiting(unsigned long delay)
 {
     while (!IsTimerUp(delay))
     {
@@ -28,7 +26,7 @@ bool TimerActions::IsTimerUp(unsigned long delay)
     return false;
 }
 
-void TimerActions::RunEvery(unsigned long delay)
+void PeriodicExecutor::RunEvery(unsigned long delay)
 {
     if (IsTimerUp(delay))
     {
