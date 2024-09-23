@@ -138,7 +138,8 @@ void AddTo(List<String> &data, String payload)
 void updtSiteLvl()
 {
     unsigned short distance = USSensor.GetDistance();
-    byte value = 100*((MAX_FOOD_LVL - distance) / MAX_FOOD_LVL);
+    byte valueMax = std::max((short)0, (short)((100 * (MAX_FOOD_LVL - distance)) / MAX_FOOD_LVL));
+    byte value = std::min((byte) 100, (byte)valueMax);
 
     String query = buildQuery(value);
     client.publish("DHT_DATA:LEVEL", query.c_str());

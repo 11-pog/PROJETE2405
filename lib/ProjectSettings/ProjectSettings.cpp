@@ -2,8 +2,8 @@
 
 const char *MQTTURL = "broker.emqx.io";
 
-const char *wifiId = "internet";       // Nome da internet
-const char *wifiPassword = "internet"; // Senha da internet
+const char *wifiId = "Anizio CPereira";       // Nome da internet
+const char *wifiPassword = "25030917"; // Senha da internet
 
 const byte trigPin = 5;  // Pino do Trigger
 const byte echoPin = 18; // Pino do Echo
