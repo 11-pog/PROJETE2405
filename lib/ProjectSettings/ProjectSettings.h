@@ -16,18 +16,18 @@
 #define DHT_PIN 27
 #define DHT_TYPE DHT22
 
-const char* MQTTURL;
+extern const char *MQTTURL;
 
-const char *wifiId; // Nome da internet
-const char *wifiPassword;  // Senha da internet
+extern const char *wifiId;       // Nome da internet
+extern const char *wifiPassword; // Senha da internet
 
-const byte trigPin;  // Pino do Trigger
-const byte echoPin; // Pino do Echo
+extern const byte trigPin; // Pino do Trigger
+extern const byte echoPin; // Pino do Echo
 
-const long timezone;
-const byte daysavetime;
+extern const long timezone;
+extern const byte daysavetime;
 
-const char* ClientID;
+extern const char *ClientID;
 
 // Object instantiation (done in the .cpp file)
 

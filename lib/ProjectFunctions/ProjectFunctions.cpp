@@ -132,7 +132,7 @@ void AddTo(List<String> &data, String payload)
 
     if(data.size() > 10)
     {
-        data.erase(data.end());
+        data.erase(data.begin());
     }
 }
 

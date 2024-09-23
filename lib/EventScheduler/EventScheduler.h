@@ -5,7 +5,7 @@
 #include <time.h>
 #include <CppTypeDefs.h>
 #include <Preferences.h>
-#include <msgpack.h>
+#include <MsgPack.h>
 #include <CRC32.h>
 #include <algorithm>
 
