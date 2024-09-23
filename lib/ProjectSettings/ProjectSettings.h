@@ -8,13 +8,15 @@
 #include <random>
 
 // Bibliotecas privadas do projeto
-#include <Common.h>
+#include <ProjectUtilities.h>
 #include <TimerActions.h>
 #include <SerialUtils.h>
 
 // Definições de constantes
 #define DHT_PIN 27
 #define DHT_TYPE DHT22
+
+#define MAX_FOOD_LVL 50u
 
 extern const char *MQTTURL;
 

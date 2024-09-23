@@ -4,8 +4,6 @@
 
 void setup()
 {
-  randomSeed(analogRead(34));
-
   Serial.begin(9600);
 
   Events.begin();
@@ -22,7 +20,7 @@ void setup()
     delay(1000);
   }
 
-  WiFi.onEvent(WifiStuff);
+  WiFi.onEvent(WifiEventHandler);
 
   Serial.println("");
   Serial.println("Conectado!");
@@ -38,8 +36,10 @@ void setup()
   delay(200);
   digitalWrite(MOTOR_PIN, 0);
 
+  client.publish("ESP_DATA", "ESP_STARTUP");
   ESPClock.SyncTime();
 }
+
 
 void loop()
 {
@@ -48,7 +48,7 @@ void loop()
     ConnectMQTT();
   }
 
-  SerialChecker.ExecuteWhileWaiting(1000);
+  TaskLoop.ExecuteWhileWaiting(1000);
 
   TestPrint();
 }

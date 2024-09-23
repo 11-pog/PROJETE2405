@@ -1,5 +1,5 @@
 // Referencia ao header desse arquivo
-#include <Common.h>
+#include <ProjectUtilities.h>
 
 #define SOUND_SPEED 0.034
 
@@ -107,7 +107,7 @@ namespace Sensor
   // Piadas
 
   
-void WifiStuff(WiFiEvent_t event)
+void WifiEventHandler(WiFiEvent_t event)
 {
   log_i("[WiFi-event] event: %d\n", event);
   switch (event)

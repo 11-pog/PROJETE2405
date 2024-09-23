@@ -21,7 +21,6 @@ void SendLevelToHost()
     client.publish("ESP_DATA", query.c_str());
 }
 
-
 void SendHumiToHost()
 {
     String query = "ACK_HUMI" + BuildAllData(LastHumidityUpdates);
@@ -130,37 +129,46 @@ void AddTo(List<String> &data, String payload)
 {
     data.push_back(payload);
 
-    if(data.size() > 10)
+    if (data.size() > 10)
     {
         data.erase(data.begin());
     }
 }
 
-PeriodicExecutor UpdateSiteLevel([]()
-                                {
-    String query = buildQuery(USSensor.GetDistance());
-    client.publish("DHT_DATA:LEVEL", query.c_str()); 
-    AddTo(LastLevelUpdates, query); });
+void updtSiteLvl()
+{
+    unsigned short distance = USSensor.GetDistance();
+    byte value = 100*((MAX_FOOD_LVL - distance) / MAX_FOOD_LVL);
 
-PeriodicExecutor UpdateSiteHumidity([]()
-                                    {
+    String query = buildQuery(value);
+    client.publish("DHT_DATA:LEVEL", query.c_str());
+    AddTo(LastLevelUpdates, query);
+}
+PeriodicExecutor UpdateSiteLevel(updtSiteLvl);
+
+void updtSiteHumidity()
+{
     String query = buildQuery(DHTSensor.GetHumidity());
     client.publish("DHT_DATA:HUMI", query.c_str());
-    AddTo(LastHumidityUpdates, query); });
+    AddTo(LastHumidityUpdates, query);
+}
+PeriodicExecutor UpdateSiteHumidity(updtSiteHumidity);
 
 // Teste
-SimultaneousExecutor SerialChecker([]()
-                                   {
-  SerialH.CheckSerialData();
+void Tasks()
+{
+    SerialH.CheckSerialData();
 
-  Events.Evaluate(ESPClock.GetCurrentTime(), Place);
+    Events.Evaluate(ESPClock.GetCurrentTime(), Place);
 
-  client.loop();
+    client.loop();
 
-  UpdateSiteHumidity.RunEvery(5000);
-  UpdateSiteLevel.RunEvery(2500);
+    UpdateSiteHumidity.RunEvery(5000);
+    UpdateSiteLevel.RunEvery(2500);
 
-  delay(1); });
+    delay(1);
+}
+SimultaneousExecutor TaskLoop(Tasks);
 
 void TestPrint()
 {

@@ -1,5 +1,5 @@
-#ifndef Common_H
-#define Common_H
+#ifndef ProjectUtilities_H
+#define ProjectUtilities_H
 
 #include <Arduino.h>
 #include <CppTypeDefs.h>
@@ -56,6 +56,6 @@ namespace Sensor
     };
 }
 
-void WifiStuff(WiFiEvent_t event);
+void WifiEventHandler(WiFiEvent_t event);
 
 #endif
