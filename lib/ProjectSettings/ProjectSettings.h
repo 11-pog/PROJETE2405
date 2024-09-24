@@ -16,7 +16,7 @@
 #define DHT_PIN 27
 #define DHT_TYPE DHT22
 
-#define MAX_FOOD_LVL 50u
+#define MAX_FOOD_LVL 11.81f
 
 extern const char *MQTTURL;
 
