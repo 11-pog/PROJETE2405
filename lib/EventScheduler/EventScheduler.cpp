@@ -144,6 +144,20 @@ void EventScheduler::Schedule(EventTime ToSchedule, unsigned short extra)
     }
 
     ScheduleList.push_back(eventData);
+    SortEvents();
+    SaveToFlash();
+}
+
+void EventScheduler::Schedule(unsigned int ID)
+{
+    if (CheckForExistingID(ID) != -1)
+    {
+        Serial.println("Event Already Scheduled");
+        return;
+    }
+
+    ScheduleList.push_back(EventData(ID));
+    SortEvents();
     SaveToFlash();
 }
 
@@ -172,7 +186,7 @@ unsigned int EventScheduler::ReSchedule(unsigned int ID, EventTime newTime)
     }
 
     ScheduleList[index].Event = newTime;
-    ScheduleList[index].RedefineID();
+    ScheduleList[index].EncodeID();
 
     SaveToFlash();
 
@@ -227,4 +241,24 @@ void EventScheduler::Evaluate(DateTime now, Action<void(unsigned short)> action)
             LastExecutedEventID = 0; // If the event time has passed, and the events are still equal (meaning there is only one scheduled event), Invalidate the last schedule
         }
     }
+}
+
+EventScheduler::EventData::EventData(EventTime event, unsigned short extra) : Event(event), Extra(extra)
+{
+    EncodeID();
+}
+
+EventScheduler::EventData::EventData(unsigned int ID) : ID(ID)
+{
+    const byte hours = (ID >> 23) & 0x1F;   // Extrai as horas
+    const byte minutes = (ID >> 17) & 0x3F; // Extrai os minutos
+    const unsigned short extra = ID & 0x1FFFF;
+
+    this->Event = EventTime(hours, minutes);
+    this->Extra = extra;
+}
+
+void EventScheduler::EventData::EncodeID()
+{
+    this->ID = (Event.Hours << 23) | (Event.Minutes << 17) | Extra;
 }

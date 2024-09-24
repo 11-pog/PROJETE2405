@@ -9,5 +9,7 @@ SCHD CLEAR
 
 SCHD DEL <id>
 
-SCHD ADD <hh:mm> <id>
+SCHD ADD 15:30 50000
+SCHD ADDID <id>
+
 SCHD SWAP <id> <hh:mm>

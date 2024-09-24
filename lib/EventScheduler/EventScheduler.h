@@ -58,15 +58,10 @@ private: // Structs
         unsigned short Extra; // Full 16 bits used maybe
         unsigned int ID;
 
-        EventData(EventTime event = EventTime(), unsigned short extra = 0) : Event(event), Extra(extra)
-        {
-            RedefineID();
-        }
+        EventData(EventTime event = EventTime(), unsigned short extra = 0);
+        EventData(unsigned int ID);
 
-        void RedefineID()
-        {
-            this->ID = (Event.Hours << 23) | (Event.Minutes << 17) | Extra;
-        }
+        void EncodeID();
 
         bool operator==(const EventData &other) const
         {
@@ -104,8 +99,9 @@ private: // Structs
 public:
     void begin();
 
-    void Evaluate(DateTime now, std::function<void(unsigned short)> Action);
+    void Evaluate(DateTime now, Action<void(unsigned short)> action);
     void Schedule(EventTime ScheduledTime, unsigned short extra = 0);
+    void Schedule(unsigned int ID);
 
     void TestPacker();
     void ResetFlash();

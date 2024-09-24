@@ -117,9 +117,23 @@ void SerialHandler::CMDFromWebJS(List<String> data)
         break;
 
     case 3:
-        if (data[0] == "SCHD" && data[1] == "DEL")
+
+        if (data[0] == "SCHD")
         {
-            UnScheduleIfValid(data[2].toInt());
+            if (data[1] == "DEL")
+            {
+                UnScheduleIfValid(data[2].toInt());
+            }
+
+            if (data[1] == "ADDID")
+            {
+                unsigned int id = data[1].toInt();
+
+                if(id != 0)
+                {
+                    Events->Schedule(id);
+                }
+            }
         }
 
     case 4:
