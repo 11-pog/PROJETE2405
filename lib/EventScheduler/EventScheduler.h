@@ -9,6 +9,8 @@
 #include <CRC32.h>
 #include <algorithm>
 
+#include <base_sch.h>
+
 class EventScheduler
 {
 public:
@@ -127,5 +129,6 @@ protected:
 };
 
 using EventList = typename EventScheduler::EventList;
+using EventTime = typename EventScheduler::EventTime;
 
 #endif

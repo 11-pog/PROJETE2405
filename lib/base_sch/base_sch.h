@@ -111,7 +111,8 @@ public:
     void UnSchedule(unsigned int ID);
     unsigned int ReSchedule(unsigned int ID, EventTime newTime);
 
-    using EventList = T<EventData>;
+    template <typename T>
+    using EventList = T;
 
 protected:
     bool IsEventDue(DateTime now);

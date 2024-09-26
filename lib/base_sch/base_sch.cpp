@@ -61,7 +61,7 @@ void base_sch<T>::SaveToFlash()
 }
 
 template <typename T>
-base_sch<T>::EventList base_sch<T>::GetDataFromFlash()
+typename base_sch<T>::EventList base_sch<T>::GetDataFromFlash()
 {
     if (!Flash.isKey("schedule"))
     {
