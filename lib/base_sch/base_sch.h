@@ -112,7 +112,7 @@ public:
     unsigned int ReSchedule(unsigned int ID, EventTime newTime);
 
     template <typename T>
-    using EventList = T;
+    using EventList = T<EventData>;
 
 protected:
     bool IsEventDue(DateTime now);
