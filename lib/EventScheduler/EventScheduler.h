@@ -9,49 +9,50 @@
 #include <CRC32.h>
 #include <algorithm>
 
-struct EventTime
-{
-    byte Hours;
-    byte Minutes;
-
-    EventTime(byte hours = 12, byte minutes = 0) : Hours(hours), Minutes(minutes) {}
-
-    bool operator==(const EventTime &other) const
-    {
-        return Hours == other.Hours && Minutes == other.Minutes;
-    }
-
-    bool operator!=(const EventTime &other) const
-    {
-        return Hours != other.Hours || Minutes != other.Minutes;
-    }
-
-    bool operator<=(const EventTime &other) const
-    {
-        return Hours < other.Hours || Hours == other.Hours && Minutes <= other.Minutes;
-    }
-
-    bool operator>=(const EventTime &other) const
-    {
-        return Hours > other.Hours || Hours == other.Hours && Minutes >= other.Minutes;
-    }
-
-    bool operator<(const EventTime &other) const
-    {
-        return Hours < other.Hours || Hours == other.Hours && Minutes < other.Minutes;
-    }
-
-    bool operator>(const EventTime &other) const
-    {
-        return Hours > other.Hours || Hours == other.Hours && Minutes > other.Minutes;
-    }
-
-    MSGPACK_DEFINE(Hours, Minutes);
-};
-
 class EventScheduler
 {
-private: // Structs
+public:
+    struct EventTime
+    {
+        byte Hours;
+        byte Minutes;
+
+        EventTime(byte hours = 12, byte minutes = 0) : Hours(hours), Minutes(minutes) {}
+
+        bool operator==(const EventTime &other) const
+        {
+            return Hours == other.Hours && Minutes == other.Minutes;
+        }
+
+        bool operator!=(const EventTime &other) const
+        {
+            return Hours != other.Hours || Minutes != other.Minutes;
+        }
+
+        bool operator<=(const EventTime &other) const
+        {
+            return Hours < other.Hours || Hours == other.Hours && Minutes <= other.Minutes;
+        }
+
+        bool operator>=(const EventTime &other) const
+        {
+            return Hours > other.Hours || Hours == other.Hours && Minutes >= other.Minutes;
+        }
+
+        bool operator<(const EventTime &other) const
+        {
+            return Hours < other.Hours || Hours == other.Hours && Minutes < other.Minutes;
+        }
+
+        bool operator>(const EventTime &other) const
+        {
+            return Hours > other.Hours || Hours == other.Hours && Minutes > other.Minutes;
+        }
+
+        MSGPACK_DEFINE(Hours, Minutes);
+    };
+
+protected: // Structs
     struct EventData
     {
         EventTime Event;      // hours = 5 bits -> 0 - 23 AND minutes = 6 bits -> 0 - 59
@@ -111,7 +112,7 @@ public:
 
     using EventList = List<EventData>;
 
-private:
+protected:
     bool IsEventDue(DateTime now);
     void SaveToFlash();
     void GetNextScheduledEvent(EventTime now);
