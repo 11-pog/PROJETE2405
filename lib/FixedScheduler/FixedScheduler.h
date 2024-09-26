@@ -1,5 +1,5 @@
-#ifndef EventScheduler_H
-#define EventScheduler_H
+#ifndef FixedScheduler_H
+#define FixedScheduler_H
 
 #include <Arduino.h>
 #include <time.h>
@@ -8,8 +8,6 @@
 #include <MsgPack.h>
 #include <CRC32.h>
 #include <algorithm>
-
-#include <base_sch.h>
 
 class EventScheduler
 {

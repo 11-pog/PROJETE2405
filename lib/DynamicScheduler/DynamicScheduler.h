@@ -1,5 +1,5 @@
-#ifndef base_sch_H
-#define base_sch_H
+#ifndef DynamicScheduler_H
+#define DynamicScheduler_H
 
 #include <Arduino.h>
 #include <time.h>
@@ -9,8 +9,7 @@
 #include <CRC32.h>
 #include <algorithm>
 
-template <typename T>
-class base_sch
+class EventScheduler
 {
 public:
     struct EventTime
@@ -111,8 +110,7 @@ public:
     void UnSchedule(unsigned int ID);
     unsigned int ReSchedule(unsigned int ID, EventTime newTime);
 
-    template <typename T>
-    using EventList = T<EventData>;
+    using EventList = List<EventData>;
 
 protected:
     bool IsEventDue(DateTime now);
@@ -127,5 +125,8 @@ protected:
     EventData CurrentEvent;
     unsigned int LastExecutedEventID;
 };
+
+using EventList = typename EventScheduler::EventList;
+using EventTime = typename EventScheduler::EventTime;
 
 #endif

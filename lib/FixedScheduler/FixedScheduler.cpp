@@ -1,7 +1,6 @@
-#include <base_sch.h>
+#include <FixedScheduler.h>
 
-template <typename T>
-void base_sch<T>::begin()
+void EventScheduler::begin()
 {
     Serial.println("This is, indeed, initializing.");
 
@@ -10,8 +9,7 @@ void base_sch<T>::begin()
     PrintScheduleList();
 }
 
-template <typename T>
-void base_sch<T>::TestPacker()
+void EventScheduler::TestPacker()
 {
     MsgPack::Packer packer;
     packer.serialize(ScheduleList);
@@ -46,8 +44,7 @@ void base_sch<T>::TestPacker()
     return;
 }
 
-template <typename T>
-void base_sch<T>::SaveToFlash()
+void EventScheduler::SaveToFlash()
 {
     SortEvents();
 
@@ -60,8 +57,7 @@ void base_sch<T>::SaveToFlash()
     Flash.putInt("checksum", checksum);
 }
 
-template <typename T>
-typename base_sch<T>::EventList base_sch<T>::GetDataFromFlash()
+EventList EventScheduler::GetDataFromFlash()
 {
     if (!Flash.isKey("schedule"))
     {
@@ -94,8 +90,7 @@ typename base_sch<T>::EventList base_sch<T>::GetDataFromFlash()
     return EventList();
 }
 
-template <typename T>
-short base_sch<T>::CheckForExistingID(unsigned int itemId)
+short EventScheduler::CheckForExistingID(unsigned int itemId)
 {
     for (short i = 0; i < ScheduleList.size(); i++)
     {
@@ -108,8 +103,7 @@ short base_sch<T>::CheckForExistingID(unsigned int itemId)
     return -1;
 }
 
-template <typename T>
-void base_sch<T>::PrintScheduleList()
+void EventScheduler::PrintScheduleList()
 {
     SortEvents();
 
@@ -133,15 +127,13 @@ void base_sch<T>::PrintScheduleList()
     }
 }
 
-template <typename T>
-void base_sch<T>::ResetFlash()
+void EventScheduler::ResetFlash()
 {
     Flash.clear();
     ScheduleList = EventList();
 }
 
-template <typename T>
-void base_sch<T>::Schedule(EventTime ToSchedule, unsigned short extra)
+void EventScheduler::Schedule(EventTime ToSchedule, unsigned short extra)
 {
     EventData eventData(ToSchedule, extra);
 
@@ -156,8 +148,7 @@ void base_sch<T>::Schedule(EventTime ToSchedule, unsigned short extra)
     SaveToFlash();
 }
 
-template <typename T>
-void base_sch<T>::Schedule(unsigned int ID)
+void EventScheduler::Schedule(unsigned int ID)
 {
     if (CheckForExistingID(ID) != -1)
     {
@@ -170,8 +161,7 @@ void base_sch<T>::Schedule(unsigned int ID)
     SaveToFlash();
 }
 
-template <typename T>
-void base_sch<T>::UnSchedule(unsigned int ID)
+void EventScheduler::UnSchedule(unsigned int ID)
 {
     short index = CheckForExistingID(ID);
 
@@ -185,8 +175,7 @@ void base_sch<T>::UnSchedule(unsigned int ID)
     SaveToFlash();
 }
 
-template <typename T>
-unsigned int base_sch<T>::ReSchedule(unsigned int ID, EventTime newTime)
+unsigned int EventScheduler::ReSchedule(unsigned int ID, EventTime newTime)
 {
     short index = CheckForExistingID(ID);
 
@@ -204,8 +193,7 @@ unsigned int base_sch<T>::ReSchedule(unsigned int ID, EventTime newTime)
     return ScheduleList[index].ID;
 }
 
-template <typename T>
-bool base_sch<T>::IsEventDue(DateTime now_tm)
+bool EventScheduler::IsEventDue(DateTime now_tm)
 {
     EventTime now(now_tm.tm_hour, now_tm.tm_min);
 
@@ -216,14 +204,12 @@ bool base_sch<T>::IsEventDue(DateTime now_tm)
     return now == eventTime;
 }
 
-template <typename T>
-void base_sch<T>::SortEvents()
+void EventScheduler::SortEvents()
 {
     std::sort(ScheduleList.begin(), ScheduleList.end());
 }
 
-template <typename T>
-void base_sch<T>::GetNextScheduledEvent(EventTime now)
+void EventScheduler::GetNextScheduledEvent(EventTime now)
 {
     SortEvents();
 
@@ -239,8 +225,7 @@ void base_sch<T>::GetNextScheduledEvent(EventTime now)
     CurrentEvent = ScheduleList[0];
 }
 
-template <typename T>
-void base_sch<T>::Evaluate(DateTime now, Action<void(unsigned short)> action)
+void EventScheduler::Evaluate(DateTime now, Action<void(unsigned short)> action)
 {
     if (!ScheduleList.empty())
     {
@@ -258,14 +243,12 @@ void base_sch<T>::Evaluate(DateTime now, Action<void(unsigned short)> action)
     }
 }
 
-template <typename T>
-base_sch<T>::EventData::EventData(EventTime event, unsigned short extra) : Event(event), Extra(extra)
+EventScheduler::EventData::EventData(EventTime event, unsigned short extra) : Event(event), Extra(extra)
 {
     EncodeID();
 }
 
-template <typename T>
-base_sch<T>::EventData::EventData(unsigned int ID) : ID(ID)
+EventScheduler::EventData::EventData(unsigned int ID) : ID(ID)
 {
     const byte hours = (ID >> 23) & 0x1F;   // Extrai as horas
     const byte minutes = (ID >> 17) & 0x3F; // Extrai os minutos
@@ -275,8 +258,7 @@ base_sch<T>::EventData::EventData(unsigned int ID) : ID(ID)
     this->Extra = extra;
 }
 
-template <typename T>
-void base_sch<T>::EventData::EncodeID()
+void EventScheduler::EventData::EncodeID()
 {
     this->ID = (Event.Hours << 23) | (Event.Minutes << 17) | Extra;
 }
