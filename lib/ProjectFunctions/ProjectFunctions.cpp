@@ -45,6 +45,18 @@ void MQTT_Act(byte *Data, unsigned int size)
         SendLevelToHost();
         SendHumiToHost();
     }
+    else if (DataSTR == "RETURNSCH")
+    {
+        std::array<unsigned int, 3> data = Events.GetTheThreeFirstInTheEventListBecauseThoseAreGoingToBeUsedInTheSiteReferToTheFunctionAbove();
+        String query = "ACK_TM";
+
+        for (unsigned int id : data)
+        {
+            query += (" " + String(id));
+        }
+
+        client.publish("ESP_DATA", query.c_str());
+    }
 }
 
 void MQTT_Callback(char *Topic, byte *payload, unsigned int loadSize)
@@ -139,7 +151,7 @@ void updtSiteLvl()
 {
     unsigned short distance = USSensor.GetDistance();
     float valueMax = std::max((float)0, (float)((100 * (MAX_FOOD_LVL - distance)) / MAX_FOOD_LVL));
-    float value = std::min((float) 100, (float)valueMax);
+    float value = std::min((float)100, (float)valueMax);
 
     String query = buildQuery(value);
     client.publish("DHT_DATA:LEVEL", query.c_str());

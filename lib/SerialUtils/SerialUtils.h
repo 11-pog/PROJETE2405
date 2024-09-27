@@ -4,7 +4,7 @@
 #include <TimerActions.h>
 #include <CppTypeDefs.h>
 
-#include <EventScheduler.h>
+#include <DynamicScheduler.h>
 
 #define DEF_SERIAL_TIMEOUT 1250U
 #define MOTOR_PIN 22U
@@ -13,7 +13,7 @@
 class SerialHandler
 {
 public:
-    SerialHandler(EventScheduler *events) : Events(events) {}
+    SerialHandler(DynamicScheduler *events) : Events(events) {}
     List<String> ReadSerialData(unsigned int timeOut = DEF_SERIAL_TIMEOUT);
     void CheckSerialData(Action<void(List<String>)> Action);
     void CheckSerialData();
@@ -32,7 +32,7 @@ private:
     String dataFragment;
     List<String> data;
 
-    EventScheduler *Events;
+    DynamicScheduler *Events;
 };
 
 #endif

@@ -39,7 +39,7 @@ extern Time::Clock ESPClock;
 extern Sensor::DHT_Sensor DHTSensor;
 extern Sensor::Ultrasonic_Sensor USSensor;
 
-extern EventScheduler Events;
+extern DynamicScheduler Events;
 extern SerialHandler SerialH;
 
 #endif

@@ -9,7 +9,7 @@
 #include <CRC32.h>
 #include <algorithm>
 
-class EventScheduler
+class DynamicScheduler
 {
 public:
     struct EventTime
@@ -104,6 +104,9 @@ public:
     void Schedule(EventTime ScheduledTime, unsigned short extra = 0);
     void Schedule(unsigned int ID);
 
+    void SwapOrAddThreeIfNotSorryImprovisedFunctionIHATEDEADLINES(std::array<unsigned int, 3> input);
+    std::array<unsigned int, 3> GetTheThreeFirstInTheEventListBecauseThoseAreGoingToBeUsedInTheSiteReferToTheFunctionAbove();
+
     void TestPacker();
     void ResetFlash();
     void PrintScheduleList();
@@ -126,7 +129,7 @@ protected:
     unsigned int LastExecutedEventID;
 };
 
-using EventList = typename EventScheduler::EventList;
-using EventTime = typename EventScheduler::EventTime;
+using EventList = typename DynamicScheduler::EventList;
+using EventTime = typename DynamicScheduler::EventTime;
 
 #endif
