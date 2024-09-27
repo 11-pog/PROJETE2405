@@ -150,10 +150,12 @@ void AddTo(List<String> &data, String payload)
 void updtSiteLvl()
 {
     unsigned short distance = USSensor.GetDistance();
-    float valueMax = std::max((float)0, (float)((100 * (MAX_FOOD_LVL - distance)) / MAX_FOOD_LVL));
-    float value = std::min((float)100, (float)valueMax);
 
-    String query = buildQuery(value);
+    float percentage = (100 * (MIN_FOOD_LVL - distance)) / (MIN_FOOD_LVL - MAX_FOOD_LVL);
+    float percentageMax = std::max((float)0, percentage);
+    float percentageMin = std::min((float)100, (float)percentageMax);
+
+    String query = buildQuery(percentageMin);
     client.publish("DHT_DATA:LEVEL", query.c_str());
     AddTo(LastLevelUpdates, query);
 }
