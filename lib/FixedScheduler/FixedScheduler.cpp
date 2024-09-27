@@ -1,15 +1,18 @@
 #include <FixedScheduler.h>
 
-void EventScheduler::begin()
+FixedScheduler::FixedScheduler(unsigned short size) : size(size) {}
+
+void FixedScheduler::begin()
 {
     Serial.println("This is, indeed, initializing.");
 
-    Flash.begin("Schedule"); // This is preferences.h btw
+    const char* SCHName = "Scheduler-s" + size;
+    Flash.begin(SCHName); // This is preferences.h btw
     this->ScheduleList = GetDataFromFlash();
     PrintScheduleList();
 }
 
-void EventScheduler::TestPacker()
+void FixedScheduler::TestPacker()
 {
     MsgPack::Packer packer;
     packer.serialize(ScheduleList);
@@ -44,7 +47,7 @@ void EventScheduler::TestPacker()
     return;
 }
 
-void EventScheduler::SaveToFlash()
+void FixedScheduler::SaveToFlash()
 {
     SortEvents();
 
@@ -57,7 +60,7 @@ void EventScheduler::SaveToFlash()
     Flash.putInt("checksum", checksum);
 }
 
-EventList EventScheduler::GetDataFromFlash()
+EventList FixedScheduler::GetDataFromFlash()
 {
     if (!Flash.isKey("schedule"))
     {
@@ -90,7 +93,7 @@ EventList EventScheduler::GetDataFromFlash()
     return EventList();
 }
 
-short EventScheduler::CheckForExistingID(unsigned int itemId)
+short FixedScheduler::CheckForExistingID(unsigned int itemId)
 {
     for (short i = 0; i < ScheduleList.size(); i++)
     {
@@ -103,7 +106,7 @@ short EventScheduler::CheckForExistingID(unsigned int itemId)
     return -1;
 }
 
-void EventScheduler::PrintScheduleList()
+void FixedScheduler::PrintScheduleList()
 {
     SortEvents();
 
@@ -127,13 +130,13 @@ void EventScheduler::PrintScheduleList()
     }
 }
 
-void EventScheduler::ResetFlash()
+void FixedScheduler::ResetFlash()
 {
     Flash.clear();
     ScheduleList = EventList();
 }
 
-void EventScheduler::Schedule(EventTime ToSchedule, unsigned short extra)
+void FixedScheduler::Schedule(EventTime ToSchedule, unsigned short extra)
 {
     EventData eventData(ToSchedule, extra);
 
@@ -148,7 +151,7 @@ void EventScheduler::Schedule(EventTime ToSchedule, unsigned short extra)
     SaveToFlash();
 }
 
-void EventScheduler::Schedule(unsigned int ID)
+void FixedScheduler::Schedule(unsigned int ID)
 {
     if (CheckForExistingID(ID) != -1)
     {
@@ -161,7 +164,7 @@ void EventScheduler::Schedule(unsigned int ID)
     SaveToFlash();
 }
 
-void EventScheduler::UnSchedule(unsigned int ID)
+void FixedScheduler::UnSchedule(unsigned int ID)
 {
     short index = CheckForExistingID(ID);
 
@@ -175,7 +178,7 @@ void EventScheduler::UnSchedule(unsigned int ID)
     SaveToFlash();
 }
 
-unsigned int EventScheduler::ReSchedule(unsigned int ID, EventTime newTime)
+unsigned int FixedScheduler::ReSchedule(unsigned int ID, EventTime newTime)
 {
     short index = CheckForExistingID(ID);
 
@@ -193,7 +196,7 @@ unsigned int EventScheduler::ReSchedule(unsigned int ID, EventTime newTime)
     return ScheduleList[index].ID;
 }
 
-bool EventScheduler::IsEventDue(DateTime now_tm)
+bool FixedScheduler::IsEventDue(DateTime now_tm)
 {
     EventTime now(now_tm.tm_hour, now_tm.tm_min);
 
@@ -204,12 +207,12 @@ bool EventScheduler::IsEventDue(DateTime now_tm)
     return now == eventTime;
 }
 
-void EventScheduler::SortEvents()
+void FixedScheduler::SortEvents()
 {
     std::sort(ScheduleList.begin(), ScheduleList.end());
 }
 
-void EventScheduler::GetNextScheduledEvent(EventTime now)
+void FixedScheduler::GetNextScheduledEvent(EventTime now)
 {
     SortEvents();
 
@@ -225,7 +228,7 @@ void EventScheduler::GetNextScheduledEvent(EventTime now)
     CurrentEvent = ScheduleList[0];
 }
 
-void EventScheduler::Evaluate(DateTime now, Action<void(unsigned short)> action)
+void FixedScheduler::Evaluate(DateTime now, Action<void(unsigned short)> action)
 {
     if (!ScheduleList.empty())
     {
@@ -243,12 +246,12 @@ void EventScheduler::Evaluate(DateTime now, Action<void(unsigned short)> action)
     }
 }
 
-EventScheduler::EventData::EventData(EventTime event, unsigned short extra) : Event(event), Extra(extra)
+FixedScheduler::EventData::EventData(EventTime event, unsigned short extra) : Event(event), Extra(extra)
 {
     EncodeID();
 }
 
-EventScheduler::EventData::EventData(unsigned int ID) : ID(ID)
+FixedScheduler::EventData::EventData(unsigned int ID) : ID(ID)
 {
     const byte hours = (ID >> 23) & 0x1F;   // Extrai as horas
     const byte minutes = (ID >> 17) & 0x3F; // Extrai os minutos
@@ -258,7 +261,7 @@ EventScheduler::EventData::EventData(unsigned int ID) : ID(ID)
     this->Extra = extra;
 }
 
-void EventScheduler::EventData::EncodeID()
+void FixedScheduler::EventData::EncodeID()
 {
     this->ID = (Event.Hours << 23) | (Event.Minutes << 17) | Extra;
 }

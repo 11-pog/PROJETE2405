@@ -9,7 +9,7 @@
 #include <CRC32.h>
 #include <algorithm>
 
-class EventScheduler
+class FixedScheduler
 {
 public:
     struct EventTime
@@ -97,7 +97,9 @@ protected: // Structs
         MSGPACK_DEFINE(Event, Extra, ID);
     };
 
+    const unsigned short size;
 public:
+    FixedScheduler(unsigned short size);
     void begin();
 
     void Evaluate(DateTime now, Action<void(unsigned short)> action);
@@ -120,13 +122,14 @@ protected:
     short CheckForExistingID(unsigned int itemId);
     void SortEvents();
 
+    
     Preferences Flash;
     EventList ScheduleList;
     EventData CurrentEvent;
     unsigned int LastExecutedEventID;
 };
 
-using EventList = typename EventScheduler::EventList;
-using EventTime = typename EventScheduler::EventTime;
+using EventList = typename FixedScheduler::EventList;
+using EventTime = typename FixedScheduler::EventTime;
 
 #endif
