@@ -232,6 +232,12 @@ void Tasks()
 }
 SimultaneousExecutor TaskLoop(Tasks);
 
+void resyncTime()
+{
+    ESPClock.SyncTime();
+}
+PeriodicExecutor ReSyncTime(resyncTime);
+
 void TestPrint()
 {
     ESPClock.PrintDateTime();

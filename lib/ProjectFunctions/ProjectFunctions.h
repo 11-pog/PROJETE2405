@@ -11,5 +11,6 @@ void Place(unsigned short Holder);
 String buildQuery(float value);
 void TestPrint();
 extern SimultaneousExecutor TaskLoop;
+extern PeriodicExecutor ReSyncTime;
 
 #endif

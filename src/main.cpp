@@ -49,6 +49,7 @@ void loop()
   }
 
   TaskLoop.ExecuteWhileWaiting(1000);
+  ReSyncTime.RunEvery(600000);
 
   TestPrint();
 }

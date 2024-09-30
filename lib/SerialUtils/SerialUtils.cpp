@@ -114,6 +114,7 @@ void SerialHandler::CMDFromWebJS(List<String> data)
                 Events->ResetFlash();
             }
         }
+
         break;
 
     case 3:
