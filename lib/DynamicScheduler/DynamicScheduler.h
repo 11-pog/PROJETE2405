@@ -114,6 +114,7 @@ public:
     unsigned int ReSchedule(unsigned int ID, EventTime newTime);
 
     using EventList = List<EventData>;
+    EventList ScheduleList;
 
 protected:
     bool IsEventDue(DateTime now);
@@ -124,7 +125,7 @@ protected:
     void SortEvents();
 
     Preferences Flash;
-    EventList ScheduleList;
+
     EventData CurrentEvent;
     unsigned int LastExecutedEventID;
 };

@@ -178,6 +178,7 @@ void DynamicScheduler::SwapOrAddThreeIfNotSorryImprovisedFunctionIHATEDEADLINES(
     }
 
     SortEvents();
+    SaveToFlash();
 }
 
 std::array<unsigned int, 3> DynamicScheduler::GetTheThreeFirstInTheEventListBecauseThoseAreGoingToBeUsedInTheSiteReferToTheFunctionAbove()

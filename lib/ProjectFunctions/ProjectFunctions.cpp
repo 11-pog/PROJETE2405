@@ -77,19 +77,30 @@ void MQTT_Act(byte *Data, unsigned int size)
     }
     else if (DataSTR == "RETURNSCH")
     {
-        std::array<unsigned int, 3> data = Events.GetTheThreeFirstInTheEventListBecauseThoseAreGoingToBeUsedInTheSiteReferToTheFunctionAbove();
-        String query = "ACK_TM";
-
-        for (unsigned int id : data)
+        if (Events.ScheduleList.size() >= 3)
         {
-            query += (" " + String(id));
-        }
+            std::array<unsigned int, 3> data = Events.GetTheThreeFirstInTheEventListBecauseThoseAreGoingToBeUsedInTheSiteReferToTheFunctionAbove();
+            String query = "ACK_TM";
 
-        client.publish("ESP_DATA", query.c_str());
+            for (unsigned int id : data)
+            {
+                query += (" " + String(id));
+            }
+
+            client.publish("ESP_DATA", query.c_str());
+        }
+        else
+        {
+            client.publish("ESP_DATA", "NOSCHD");
+        }
     }
     else if (KeywordsSTR.size() >= 4 && KeywordsSTR[0] == "SETSCH")
     {
-        std::array<unsigned int, 3> IDs = {KeywordsSTR[1].toInt(), KeywordsSTR[2].toInt(), KeywordsSTR[3].toInt()};
+        std::array<unsigned int, 3> IDs = {
+            static_cast<unsigned int>(KeywordsSTR[1].toInt()),
+            static_cast<unsigned int>(KeywordsSTR[2].toInt()),
+            static_cast<unsigned int>(KeywordsSTR[3].toInt())};
+
         Events.SwapOrAddThreeIfNotSorryImprovisedFunctionIHATEDEADLINES(IDs);
     }
 }
@@ -147,7 +158,8 @@ void Place(unsigned short Holder)
     Serial.println("In fact, this event has been triggered: ");
     Serial.println(Holder);
 
-    unsigned short timeToHoldON = Holder ? Holder : 5000;
+    unsigned short timeToHoldON = Holder ? Holder : 500;
+    timeToHoldON *= 20;
 
     Serial.println("Motor ON");
     digitalWrite(MOTOR_PIN, 1);
