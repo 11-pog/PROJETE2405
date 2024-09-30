@@ -15,6 +15,34 @@ String BuildAllData(List<String> data)
     return final;
 }
 
+List<String> Keywordify(String input)
+{
+    List<String> keywords;
+    String fragment = "";
+
+    for (int i = 0; i < input.length(); i++)
+    {
+        char character = input.charAt(i);
+
+        if (character == ' ')
+        {
+            fragment.trim();
+            if (fragment.length() > 0)
+            {
+                keywords.push_back(fragment);
+                fragment = "";
+            }
+        }
+        else
+        {
+            fragment += character;
+        }
+    }
+
+    keywords.push_back(fragment);
+    return keywords;
+}
+
 void SendLevelToHost()
 {
     String query = "ACK_LVL" + BuildAllData(LastLevelUpdates);
@@ -30,6 +58,8 @@ void SendHumiToHost()
 void MQTT_Act(byte *Data, unsigned int size)
 {
     String DataSTR = String((char *)Data, size);
+    List<String> KeywordsSTR = Keywordify(DataSTR);
+
     if (DataSTR == "ON")
     {
         Serial.println("MotorON");
@@ -56,6 +86,11 @@ void MQTT_Act(byte *Data, unsigned int size)
         }
 
         client.publish("ESP_DATA", query.c_str());
+    }
+    else if (KeywordsSTR.size() >= 4 && KeywordsSTR[0] == "SETSCH")
+    {
+        std::array<unsigned int, 3> IDs = {KeywordsSTR[1].toInt(), KeywordsSTR[2].toInt(), KeywordsSTR[3].toInt()};
+        Events.SwapOrAddThreeIfNotSorryImprovisedFunctionIHATEDEADLINES(IDs);
     }
 }
 
