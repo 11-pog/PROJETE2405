@@ -55,6 +55,8 @@ void SendHumiToHost()
     client.publish("ESP_DATA", query.c_str());
 }
 
+bool ON = false;
+
 void MQTT_Act(byte *Data, unsigned int size)
 {
     String DataSTR = String((char *)Data, size);
@@ -69,6 +71,8 @@ void MQTT_Act(byte *Data, unsigned int size)
     {
         Serial.println("MotorOFF");
         digitalWrite(MOTOR_PIN, 0);
+
+        ON = false;
     }
     else if (DataSTR == "GETGRAPHINFO")
     {
@@ -103,11 +107,47 @@ void MQTT_Act(byte *Data, unsigned int size)
 
         Events.SwapOrAddThreeIfNotSorryImprovisedFunctionIHATEDEADLINES(IDs);
     }
+    else if (KeywordsSTR.size() >= 2 && KeywordsSTR[0] == "SPIN")
+    {
+        unsigned int timetospin = static_cast<unsigned int>(KeywordsSTR[1].toInt());
+
+        Serial.print("Spinning for ");
+        Serial.print(timetospin);
+        Serial.println(" milliseconds.");
+
+        digitalWrite(MOTOR_PIN, 1);
+
+        delay(timetospin);
+
+        digitalWrite(MOTOR_PIN, 0);
+    }
+    else if (KeywordsSTR.size() >= 3 && KeywordsSTR[0] == "ONTIMED")
+    {
+        ON = true;
+
+        unsigned int timeon = static_cast<unsigned int>(KeywordsSTR[1].toInt());
+        unsigned int timeoff = static_cast<unsigned int>(KeywordsSTR[2].toInt());
+
+        while(ON)
+        {
+            client.loop();
+
+            delay(timeoff);
+
+            digitalWrite(MOTOR_PIN, 1);
+
+            delay(timeon);
+
+            digitalWrite(MOTOR_PIN, 0);
+        }
+    }
 }
 
 void MQTT_Callback(char *Topic, byte *payload, unsigned int loadSize)
 {
     string topic(Topic);
+    String DataSTR = String((char *)payload, loadSize);
+
     if (topic != "ESP_COMMAND")
     {
         Serial.print("Recieved: ");
