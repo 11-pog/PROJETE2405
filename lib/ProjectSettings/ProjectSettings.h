@@ -19,6 +19,9 @@
 #define MAX_FOOD_LVL 5.0f
 #define MIN_FOOD_LVL 30.0f
 
+#define MOTORPULSEON 200u
+#define MOTORPULSEOFF 200u
+
 extern const char *MQTTURL;
 
 extern const char *wifiId;       // Nome da internet

@@ -9,7 +9,7 @@ void MQTT_Callback(char *Topic, byte *payload, unsigned int loadSize);
 void ConnectMQTT();
 void Place(unsigned short Holder);
 String buildQuery(float value);
-void TestPrint();
+void DebugPrint();
 extern SimultaneousExecutor TaskLoop;
 extern PeriodicExecutor ReSyncTime;
 

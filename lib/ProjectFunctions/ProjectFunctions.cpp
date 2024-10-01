@@ -130,15 +130,15 @@ void MQTT_Act(byte *Data, unsigned int size)
 
         while(ON)
         {
-            client.loop();
-
-            delay(timeoff);
-
             digitalWrite(MOTOR_PIN, 1);
 
             delay(timeon);
 
             digitalWrite(MOTOR_PIN, 0);
+
+            delay(timeoff);
+
+            client.loop();
         }
     }
 }
@@ -199,15 +199,22 @@ void Place(unsigned short Holder)
     Serial.println(Holder);
 
     unsigned short timeToHoldON = Holder ? Holder : 500;
-    timeToHoldON *= 20;
+    timeToHoldON *= 10;
 
-    Serial.println("Motor ON");
-    digitalWrite(MOTOR_PIN, 1);
+    unsigned int amountdone = 0;
 
-    delay(timeToHoldON);
+    while(amountdone <= timeToHoldON)
+    {
+        digitalWrite(MOTOR_PIN, 1);
 
-    Serial.println("Motor OFF");
-    digitalWrite(MOTOR_PIN, 0);
+        delay(MOTORPULSEON);
+
+        digitalWrite(MOTOR_PIN, 0);
+
+        delay(MOTORPULSEOFF);
+
+        amountdone += MOTORPULSEOFF + MOTORPULSEON;
+    }
 }
 
 String buildQuery(float value)
@@ -278,7 +285,7 @@ void resyncTime()
 }
 PeriodicExecutor ReSyncTime(resyncTime);
 
-void TestPrint()
+void DebugPrint()
 {
     ESPClock.PrintDateTime();
 

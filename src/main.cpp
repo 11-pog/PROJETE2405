@@ -33,7 +33,7 @@ void setup()
   ConnectMQTT();
 
   digitalWrite(MOTOR_PIN, 1);
-  delay(200);
+  delay(100);
   digitalWrite(MOTOR_PIN, 0);
 
   client.publish("ESP_DATA", "ESP_STARTUP");
@@ -51,5 +51,5 @@ void loop()
   TaskLoop.ExecuteWhileWaiting(1000);
   ReSyncTime.RunEvery(600000);
 
-  TestPrint();
+  DebugPrint();
 }
