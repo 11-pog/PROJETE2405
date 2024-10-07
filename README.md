@@ -32,10 +32,4 @@ O projeto consistia em um **alimentador automático para ovelhas**, com algumas 
 
 ![NEON GENESIS PROJETE 2K24](https://github.com/11-pog/PROJETE2405ESP/blob/main/THE%20END%20OF%20PROJETE.png?raw=true)
 
-Em 2025 tem PROJETE denovo xd.
-
-Nota: Eu vo deixar isso aqui só pra no futuro eu olhar e dizer "Esse projeto era um lixo"
-
-Outra nota: Esse README foi feito com a ajudinha do meu mano ChatGpt (pq eu sou horrível em escrita, me desculpa).
-
-Terceira nota: Ignora a imagem.
+Em 2025 tem PROJETE denovo XD.

@@ -33,9 +33,3 @@ The project was an **automatic sheep feeder** with some functionalities: two gra
 ![NEON GENESIS PROJETE 2K24](https://github.com/11-pog/PROJETE2405ESP/blob/main/THE%20END%20OF%20PROJETE.png?raw=true)
 
 PROJETE will happen again in 2025 lmao
-
-Note: This is only here for me to one day look back at it and say "Holy hell this project sucked"
-
-Another note: This README was made with the help of my boy ChatGpt (Because i suck at writing, sorry).
-
-Third note: Ignore the image.
