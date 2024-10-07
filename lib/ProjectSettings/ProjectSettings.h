@@ -16,7 +16,11 @@
 #define DHT_PIN 27
 #define DHT_TYPE DHT22
 
-#define MAX_FOOD_LVL 11.81f
+#define MAX_FOOD_LVL 5.0f
+#define MIN_FOOD_LVL 30.0f
+
+#define MOTORPULSEON 200u
+#define MOTORPULSEOFF 200u
 
 extern const char *MQTTURL;
 
@@ -39,7 +43,7 @@ extern Time::Clock ESPClock;
 extern Sensor::DHT_Sensor DHTSensor;
 extern Sensor::Ultrasonic_Sensor USSensor;
 
-extern EventScheduler Events;
+extern DynamicScheduler Events;
 extern SerialHandler SerialH;
 
 #endif

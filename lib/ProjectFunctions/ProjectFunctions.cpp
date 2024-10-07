@@ -15,6 +15,34 @@ String BuildAllData(List<String> data)
     return final;
 }
 
+List<String> Keywordify(String input)
+{
+    List<String> keywords;
+    String fragment = "";
+
+    for (int i = 0; i < input.length(); i++)
+    {
+        char character = input.charAt(i);
+
+        if (character == ' ')
+        {
+            fragment.trim();
+            if (fragment.length() > 0)
+            {
+                keywords.push_back(fragment);
+                fragment = "";
+            }
+        }
+        else
+        {
+            fragment += character;
+        }
+    }
+
+    keywords.push_back(fragment);
+    return keywords;
+}
+
 void SendLevelToHost()
 {
     String query = "ACK_LVL" + BuildAllData(LastLevelUpdates);
@@ -27,9 +55,13 @@ void SendHumiToHost()
     client.publish("ESP_DATA", query.c_str());
 }
 
+bool ON = false;
+
 void MQTT_Act(byte *Data, unsigned int size)
 {
     String DataSTR = String((char *)Data, size);
+    List<String> KeywordsSTR = Keywordify(DataSTR);
+
     if (DataSTR == "ON")
     {
         Serial.println("MotorON");
@@ -39,17 +71,83 @@ void MQTT_Act(byte *Data, unsigned int size)
     {
         Serial.println("MotorOFF");
         digitalWrite(MOTOR_PIN, 0);
+
+        ON = false;
     }
     else if (DataSTR == "GETGRAPHINFO")
     {
         SendLevelToHost();
         SendHumiToHost();
     }
+    else if (DataSTR == "RETURNSCH")
+    {
+        if (Events.ScheduleList.size() >= 3)
+        {
+            std::array<unsigned int, 3> data = Events.GetTheThreeFirstInTheEventListBecauseThoseAreGoingToBeUsedInTheSiteReferToTheFunctionAbove();
+            String query = "ACK_TM";
+
+            for (unsigned int id : data)
+            {
+                query += (" " + String(id));
+            }
+
+            client.publish("ESP_DATA", query.c_str());
+        }
+        else
+        {
+            client.publish("ESP_DATA", "NOSCHD");
+        }
+    }
+    else if (KeywordsSTR.size() >= 4 && KeywordsSTR[0] == "SETSCH")
+    {
+        std::array<unsigned int, 3> IDs = {
+            static_cast<unsigned int>(KeywordsSTR[1].toInt()),
+            static_cast<unsigned int>(KeywordsSTR[2].toInt()),
+            static_cast<unsigned int>(KeywordsSTR[3].toInt())};
+
+        Events.SwapOrAddThreeIfNotSorryImprovisedFunctionIHATEDEADLINES(IDs);
+    }
+    else if (KeywordsSTR.size() >= 2 && KeywordsSTR[0] == "SPIN")
+    {
+        unsigned int timetospin = static_cast<unsigned int>(KeywordsSTR[1].toInt());
+
+        Serial.print("Spinning for ");
+        Serial.print(timetospin);
+        Serial.println(" milliseconds.");
+
+        digitalWrite(MOTOR_PIN, 1);
+
+        delay(timetospin);
+
+        digitalWrite(MOTOR_PIN, 0);
+    }
+    else if (KeywordsSTR.size() >= 3 && KeywordsSTR[0] == "ONTIMED")
+    {
+        ON = true;
+
+        unsigned int timeon = static_cast<unsigned int>(KeywordsSTR[1].toInt());
+        unsigned int timeoff = static_cast<unsigned int>(KeywordsSTR[2].toInt());
+
+        while(ON)
+        {
+            digitalWrite(MOTOR_PIN, 1);
+
+            delay(timeon);
+
+            digitalWrite(MOTOR_PIN, 0);
+
+            delay(timeoff);
+
+            client.loop();
+        }
+    }
 }
 
 void MQTT_Callback(char *Topic, byte *payload, unsigned int loadSize)
 {
     string topic(Topic);
+    String DataSTR = String((char *)payload, loadSize);
+
     if (topic != "ESP_COMMAND")
     {
         Serial.print("Recieved: ");
@@ -100,15 +198,23 @@ void Place(unsigned short Holder)
     Serial.println("In fact, this event has been triggered: ");
     Serial.println(Holder);
 
-    unsigned short timeToHoldON = Holder ? Holder : 5000;
+    unsigned short timeToHoldON = Holder ? Holder : 500;
+    timeToHoldON *= 10;
 
-    Serial.println("Motor ON");
-    digitalWrite(MOTOR_PIN, 1);
+    unsigned int amountdone = 0;
 
-    delay(timeToHoldON);
+    while(amountdone <= timeToHoldON)
+    {
+        digitalWrite(MOTOR_PIN, 1);
 
-    Serial.println("Motor OFF");
-    digitalWrite(MOTOR_PIN, 0);
+        delay(MOTORPULSEON);
+
+        digitalWrite(MOTOR_PIN, 0);
+
+        delay(MOTORPULSEOFF);
+
+        amountdone += MOTORPULSEOFF + MOTORPULSEON;
+    }
 }
 
 String buildQuery(float value)
@@ -138,10 +244,12 @@ void AddTo(List<String> &data, String payload)
 void updtSiteLvl()
 {
     unsigned short distance = USSensor.GetDistance();
-    float valueMax = std::max((float)0, (float)((100 * (MAX_FOOD_LVL - distance)) / MAX_FOOD_LVL));
-    float value = std::min((float) 100, (float)valueMax);
 
-    String query = buildQuery(value);
+    float percentage = (100 * (MIN_FOOD_LVL - distance)) / (MIN_FOOD_LVL - MAX_FOOD_LVL);
+    float percentageMax = std::max((float)0, percentage);
+    float percentageMin = std::min((float)100, (float)percentageMax);
+
+    String query = buildQuery(percentageMin);
     client.publish("DHT_DATA:LEVEL", query.c_str());
     AddTo(LastLevelUpdates, query);
 }
@@ -171,7 +279,13 @@ void Tasks()
 }
 SimultaneousExecutor TaskLoop(Tasks);
 
-void TestPrint()
+void resyncTime()
+{
+    ESPClock.SyncTime();
+}
+PeriodicExecutor ReSyncTime(resyncTime);
+
+void DebugPrint()
 {
     ESPClock.PrintDateTime();
 

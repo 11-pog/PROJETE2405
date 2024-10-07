@@ -1,5 +1,5 @@
-#ifndef EventScheduler_H
-#define EventScheduler_H
+#ifndef FixedScheduler_H
+#define FixedScheduler_H
 
 #include <Arduino.h>
 #include <time.h>
@@ -9,49 +9,50 @@
 #include <CRC32.h>
 #include <algorithm>
 
-struct EventTime
+class FixedScheduler
 {
-    byte Hours;
-    byte Minutes;
-
-    EventTime(byte hours = 12, byte minutes = 0) : Hours(hours), Minutes(minutes) {}
-
-    bool operator==(const EventTime &other) const
+public:
+    struct EventTime
     {
-        return Hours == other.Hours && Minutes == other.Minutes;
-    }
+        byte Hours;
+        byte Minutes;
 
-    bool operator!=(const EventTime &other) const
-    {
-        return Hours != other.Hours || Minutes != other.Minutes;
-    }
+        EventTime(byte hours = 12, byte minutes = 0) : Hours(hours), Minutes(minutes) {}
 
-    bool operator<=(const EventTime &other) const
-    {
-        return Hours < other.Hours || Hours == other.Hours && Minutes <= other.Minutes;
-    }
+        bool operator==(const EventTime &other) const
+        {
+            return Hours == other.Hours && Minutes == other.Minutes;
+        }
 
-    bool operator>=(const EventTime &other) const
-    {
-        return Hours > other.Hours || Hours == other.Hours && Minutes >= other.Minutes;
-    }
+        bool operator!=(const EventTime &other) const
+        {
+            return Hours != other.Hours || Minutes != other.Minutes;
+        }
 
-    bool operator<(const EventTime &other) const
-    {
-        return Hours < other.Hours || Hours == other.Hours && Minutes < other.Minutes;
-    }
+        bool operator<=(const EventTime &other) const
+        {
+            return Hours < other.Hours || Hours == other.Hours && Minutes <= other.Minutes;
+        }
 
-    bool operator>(const EventTime &other) const
-    {
-        return Hours > other.Hours || Hours == other.Hours && Minutes > other.Minutes;
-    }
+        bool operator>=(const EventTime &other) const
+        {
+            return Hours > other.Hours || Hours == other.Hours && Minutes >= other.Minutes;
+        }
 
-    MSGPACK_DEFINE(Hours, Minutes);
-};
+        bool operator<(const EventTime &other) const
+        {
+            return Hours < other.Hours || Hours == other.Hours && Minutes < other.Minutes;
+        }
 
-class EventScheduler
-{
-private: // Structs
+        bool operator>(const EventTime &other) const
+        {
+            return Hours > other.Hours || Hours == other.Hours && Minutes > other.Minutes;
+        }
+
+        MSGPACK_DEFINE(Hours, Minutes);
+    };
+
+protected: // Structs
     struct EventData
     {
         EventTime Event;      // hours = 5 bits -> 0 - 23 AND minutes = 6 bits -> 0 - 59
@@ -96,7 +97,9 @@ private: // Structs
         MSGPACK_DEFINE(Event, Extra, ID);
     };
 
+    const unsigned short size;
 public:
+    FixedScheduler(unsigned short size);
     void begin();
 
     void Evaluate(DateTime now, Action<void(unsigned short)> action);
@@ -111,7 +114,7 @@ public:
 
     using EventList = List<EventData>;
 
-private:
+protected:
     bool IsEventDue(DateTime now);
     void SaveToFlash();
     void GetNextScheduledEvent(EventTime now);
@@ -119,12 +122,14 @@ private:
     short CheckForExistingID(unsigned int itemId);
     void SortEvents();
 
+    
     Preferences Flash;
     EventList ScheduleList;
     EventData CurrentEvent;
     unsigned int LastExecutedEventID;
 };
 
-using EventList = typename EventScheduler::EventList;
+using EventList = typename FixedScheduler::EventList;
+using EventTime = typename FixedScheduler::EventTime;
 
 #endif
